@@ -1,10 +1,18 @@
 import { Stack } from "expo-router";
+import { StyleSheet } from "react-native";
 
 export default function RootLayout() {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ title: "My Todos" }} />
-      <Stack.Screen name="add" options={{ title: "Add New Todo" }} />
+      <Stack.Screen
+        name="index"
+        options={{
+          headerTitle: "Home",
+        }}
+      />
+      <Stack.Screen name="add" options={{ headerTitle: "Add New Todo" }} />
+
+      <Stack.Screen name="details" options={{ headerTitle: "Details" }} />
     </Stack>
   );
 }
