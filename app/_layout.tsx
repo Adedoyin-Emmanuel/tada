@@ -8,6 +8,7 @@ export default function RootLayout() {
         name="index"
         options={{
           headerTitle: "Home",
+          headerShown: false,
         }}
       />
       <Stack.Screen name="add" options={{ headerTitle: "Add New Todo" }} />
