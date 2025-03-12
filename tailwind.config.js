@@ -27,7 +27,7 @@ module.exports = {
 
         others: {
           default: "#908986",
-          light: "hsla(18, 4%, 55%, 0.1",
+          light: "hsla(18, 4%, 55%, 0.1)",
         },
       },
       fontFamily: {

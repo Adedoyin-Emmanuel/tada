@@ -6,14 +6,85 @@ import { Text, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
-  const [isChecked, setIsChecked] = useState(false);
+  const [todos, setTodos] = useState([
+    {
+      id: 1,
+      title: "Drink 8 glasses of water",
+      category: {
+        name: "health",
+        color: "text-health-default",
+        bgColor: "health-light",
+      },
+      isChecked: false,
+      subTodos: [],
+    },
+    {
+      id: 2,
+      title: "Edit the PDF",
+      category: {
+        name: "WORK",
+        color: "text-work-default",
+        bgColor: "work-light",
+      },
+      isChecked: false,
+      subTodos: [{ id: 21, title: "Add executive summary", isChecked: false }],
+    },
+    {
+      id: 3,
+      title: "Write in a gratitude journal",
+      category: {
+        name: "Mental Health",
+        color: "text-mentalHealth-default",
+        bgColor: "mentalHealth-light",
+      },
+      isChecked: false,
+      subTodos: [
+        { id: 31, title: "Get a note", isChecked: false },
+        { id: 32, title: "Follow the YouTube tutorial", isChecked: false },
+      ],
+    },
+
+    {
+      id: 4,
+      title: "Call my baby girl",
+      category: {
+        name: "others",
+        color: "text-others-default",
+        bgColor: "others-light",
+      },
+      isChecked: false,
+      subTodos: [],
+    },
+  ]);
+
+  const toggleTodo = (todoId: number, subTodoId?: number) => {
+    setTodos(
+      todos.map((todo) => {
+        if (subTodoId) {
+          if (todo.id === todoId) {
+            return {
+              ...todo,
+              subTodos: todo.subTodos.map((subTodo) =>
+                subTodo.id === subTodoId
+                  ? { ...subTodo, isChecked: !subTodo.isChecked }
+                  : subTodo
+              ),
+            };
+          }
+        } else if (todo.id === todoId) {
+          return { ...todo, isChecked: !todo.isChecked };
+        }
+        return todo;
+      })
+    );
+  };
 
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView>
         <View className="w-full p-5">
           <Text className="font-ibold text-[36px]">
-            Today <Text className="font-imedium opacity-[30%]">12 Mar</Text>
+            Today <Text className="font-imedium opacity-[30%]">26 Dec</Text>
           </Text>
 
           <View className="flex-1 w-full mt-10 flex-row flex-wrap gap-4">
@@ -100,25 +171,66 @@ const Home = () => {
             </View>
           </View>
 
-          <View className="">
-            <Checkbox
-              value={isChecked}
-              onValueChange={() => setIsChecked(!isChecked)}
-              style={{
-                width: 24,
-                height: 24,
-                borderWidth: 1,
-                borderColor: "#D6D6D6",
-                borderRadius: 4,
-              }}
-              color={isChecked ? "#393433" : undefined}
-            />
-            <Text className="text-primary font-iregular text-[17px]">
-              Drink 8 glasses of water
-            </Text>
+          <View className="w-full mt-10">
+            <View>
+              {todos.map((todo) => (
+                <View key={todo.id} className="mb-5">
+                  <View className="flex-row items-center gap-2">
+                    <Checkbox
+                      value={todo.isChecked}
+                      onValueChange={() => toggleTodo(todo.id)}
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderWidth: 1,
+                        borderColor: "#D6D6D6",
+                        borderRadius: 4,
+                      }}
+                      color={todo.isChecked ? "#393433" : undefined}
+                    />
+                    <View className="my-2 mx-2 flex items-start gap-2">
+                      <Text className="text-primary font-imedium text-[17px]">
+                        {todo.title}
+                      </Text>
 
-            <View className="bg-health rounded-full px-2 py-1">
-              <Text className="uppercase">health</Text>
+                      <View
+                        className={`bg-${todo.category.bgColor} rounded flex items-center justify-center h-[23px] self-start px-2`}
+                      >
+                        <Text
+                          className={`uppercase ${todo.category.color} font-imedium`}
+                        >
+                          {todo.category.name}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+
+                  {todo.subTodos.map((subTodo) => (
+                    <View
+                      key={subTodo.id}
+                      className="flex-row items-center gap-2 ml-12 mt-2"
+                    >
+                      <Checkbox
+                        value={subTodo.isChecked}
+                        onValueChange={() => toggleTodo(todo.id, subTodo.id)}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderWidth: 1,
+                          borderColor: "#D6D6D6",
+                          borderRadius: 4,
+                        }}
+                        color={subTodo.isChecked ? "#393433" : undefined}
+                      />
+                      <View className="flex items-start">
+                        <Text className="text-primary font-iregular text-[16px]">
+                          {subTodo.title}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              ))}
             </View>
           </View>
         </View>
