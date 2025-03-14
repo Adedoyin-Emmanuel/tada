@@ -29,11 +29,19 @@ export default function RootLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerTitle: "Home",
           headerShown: false,
         }}
       />
-      <Stack.Screen name="add" options={{ headerTitle: "Add New Todo" }} />
+
+      <Stack.Screen name="add" options={{ headerShown: false }} />
+
+      <Stack.Screen
+        name="view-task"
+        options={{
+          headerShown: false,
+          presentation: "modal",
+        }}
+      />
 
       <Stack.Screen name="details" options={{ headerTitle: "Details" }} />
     </Stack>
