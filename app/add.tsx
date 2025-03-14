@@ -99,7 +99,6 @@ const Add = () => {
   };
 
   const handleTimeSelect = (event: any, time?: Date) => {
-    setShowTimePicker(false);
     if (time) {
       setSelectedTime(time);
     }
@@ -272,19 +271,22 @@ const Add = () => {
                     </Text>
                   </TouchableOpacity>
                 </View>
-                <DateTimePicker
-                  value={selectedTime || new Date()}
-                  mode="time"
-                  is24Hour={false}
-                  display="spinner"
-                  onChange={handleTimeSelect}
-                />
+                <View className="rounded-lg">
+                  <DateTimePicker
+                    value={selectedTime || new Date()}
+                    mode="time"
+                    is24Hour={false}
+                    display="spinner"
+                    onChange={handleTimeSelect}
+                    textColor="#000000"
+                  />
+                </View>
               </View>
             </View>
           </Modal>
         )}
       </View>
-      <StatusBar />
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 };

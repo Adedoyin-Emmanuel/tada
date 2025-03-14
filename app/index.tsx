@@ -320,7 +320,7 @@ const Home = () => {
           </Pressable>
         </View>
       </GestureHandlerRootView>
-      <StatusBar />
+      <StatusBar style="dark" />
     </SafeAreaView>
   );
 };
