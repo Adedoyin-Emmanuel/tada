@@ -5,6 +5,7 @@
       "name": "reactnative-journey",
       "dependencies": {
         "@expo/vector-icons": "^14.0.2",
+        "@react-native-community/datetimepicker": "^8.3.0",
         "@react-navigation/bottom-tabs": "^7.2.0",
         "@react-navigation/native": "^7.0.14",
         "expo": "~52.0.37",
@@ -424,6 +425,8 @@
     "@radix-ui/react-compose-refs": ["@radix-ui/react-compose-refs@1.0.0", "", { "dependencies": { "@babel/runtime": "^7.13.10" }, "peerDependencies": { "react": "^16.8 || ^17.0 || ^18.0" } }, "sha512-0KaSv6sx787/hK3eF53iOkiSLwAGlFMx5lotrqD2pTjB18KbybKoEIgkNZTKC60YECDQTKGTRcDBILwZVqVKvA=="],
 
     "@radix-ui/react-slot": ["@radix-ui/react-slot@1.0.1", "", { "dependencies": { "@babel/runtime": "^7.13.10", "@radix-ui/react-compose-refs": "1.0.0" }, "peerDependencies": { "react": "^16.8 || ^17.0 || ^18.0" } }, "sha512-avutXAFL1ehGvAXtPquu0YK5oz6ctS474iM3vNGQIkswrVhdrS52e3uoMQBzZhNRAIE0jBnUyXWNmSjGHhCFcw=="],
+
+    "@react-native-community/datetimepicker": ["@react-native-community/datetimepicker@8.3.0", "", { "dependencies": { "invariant": "^2.2.4" }, "peerDependencies": { "expo": ">=50.0.0", "react": "*", "react-native": "*", "react-native-windows": "*" }, "optionalPeers": ["expo", "react-native-windows"] }, "sha512-K/KgaJbLtjMpx4PaG4efrVIcSe6+DbLufeX1lwPB5YY8i3sq9dOh6WcAcMTLbaRTUpurebQTkl7puHPFm9GalA=="],
 
     "@react-native/assets-registry": ["@react-native/assets-registry@0.76.7", "", {}, "sha512-o79whsqL5fbPTUQO9w1FptRd4cw1TaeOrXtQSLQeDrMVAenw/wmsjyPK10VKtvqxa1KNMtWEyfgxcM8CVZVFmg=="],
 
