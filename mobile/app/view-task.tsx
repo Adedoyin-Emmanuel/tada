@@ -1,16 +1,9 @@
-import React, { useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import Svg, { Path } from "react-native-svg";
-import CheckBox, { Checkbox } from "expo-checkbox";
-import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  Text,
-  View,
-  ScrollView,
-  Pressable,
-  TouchableOpacity,
-} from "react-native";
 import { router } from "expo-router";
+import React, { useState } from "react";
+import { Checkbox } from "expo-checkbox";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, ScrollView, Pressable } from "react-native";
 
 import Cancel from "@/components/cancel";
 

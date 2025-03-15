@@ -1,8 +1,7 @@
 import { router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import Svg, { Path } from "react-native-svg";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Checkbox from "expo-checkbox";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   View,
