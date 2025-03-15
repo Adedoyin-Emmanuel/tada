@@ -9,7 +9,7 @@ public class Todo : IBase
     public string Title { get; set; }
     public Category Category { get; set; } = Category.Others;
     public bool IsDone { get; set; } = false;
-    public List<SubTodo.SubTodo> SubTodos { get; set; }
+    public List<SubTodo.SubTodo> SubTodos { get; set; } = new();
     public DateTime DueDate { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
