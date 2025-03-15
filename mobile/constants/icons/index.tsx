@@ -1,7 +1,7 @@
 import { Svg, Path } from "react-native-svg";
 
-export const ICONS = {
-  health: () => {
+export const CategoryIcons = {
+  Health: () => {
     return (
       <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <Path
@@ -14,7 +14,7 @@ export const ICONS = {
     );
   },
 
-  work: () => {
+  Work: () => {
     return (
       <Svg width="18" height="22" viewBox="0 0 18 22" fill="none">
         <Path
@@ -27,7 +27,7 @@ export const ICONS = {
     );
   },
 
-  mentalHealth: () => {
+  MentalHealth: () => {
     return (
       <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <Path
@@ -50,7 +50,7 @@ export const ICONS = {
     );
   },
 
-  others: () => {
+  Others: () => {
     return (
       <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
         <Path
