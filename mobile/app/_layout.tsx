@@ -42,8 +42,6 @@ export default function RootLayout() {
           presentation: "modal",
         }}
       />
-
-      <Stack.Screen name="details" options={{ headerTitle: "Details" }} />
     </Stack>
   );
 }
