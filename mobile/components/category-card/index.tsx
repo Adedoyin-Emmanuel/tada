@@ -24,7 +24,7 @@ const CategoryCard = ({
 
       <Text className="font-isemibold text-[17px]">
         {count}{" "}
-        <Text className="font-imedium text-[#121212] opacity-[60%] capitalize">
+        <Text className="font-imedium text-[#171313] opacity-[60%] capitalize">
           {title}
         </Text>
       </Text>
