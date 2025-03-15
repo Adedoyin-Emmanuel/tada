@@ -1,0 +1,6 @@
+namespace api.Domain.Constants;
+
+public class _gitkee
+{
+    
+}
