@@ -9,12 +9,12 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Pressable,
   TextInput,
   Modal,
-  Platform,
 } from "react-native";
 import { useState } from "react";
+import Button from "@/components/button";
+import { ClockIcon } from "@/constants/icons";
 
 type Category = {
   id: number;
@@ -216,7 +216,6 @@ const Add = () => {
             </View>
           )}
 
-          {/* Buttons */}
           <View className="flex-row items-center justify-between gap-4">
             <TouchableOpacity
               disabled={!taskText}
@@ -225,32 +224,15 @@ const Add = () => {
                 !taskText ? "bg-[#DEDEDE]" : "bg-[#393433]"
               } items-center justify-center`}
             >
-              <Svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <Path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 12.583 22.9546 13.1555 22.8673 13.714C22.7945 14.1789 22.7581 14.4114 22.6659 14.5191C22.5671 14.6346 22.4996 14.671 22.3488 14.69C22.2081 14.7078 21.8857 14.5612 21.2408 14.2678C20.8627 14.0958 20.4425 14 20 14C18.3431 14 17 15.3431 17 17C15.3431 17 14 18.3431 14 20C14 20.4425 14.0958 20.8627 14.2678 21.2408C14.5612 21.8857 14.7078 22.2081 14.69 22.3488C14.671 22.4996 14.6346 22.5671 14.5191 22.6659C14.4114 22.7581 14.1789 22.7945 13.714 22.8673C13.1555 22.9546 12.583 23 12 23C5.92487 23 1 18.0751 1 12ZM13 6C13 5.44772 12.5523 5 12 5C11.4477 5 11 5.44772 11 6V12C11 12.3788 11.214 12.725 11.5528 12.8944L15.5528 14.8944C16.0468 15.1414 16.6474 14.9412 16.8944 14.4472C17.1414 13.9532 16.9412 13.3526 16.4472 13.1056L13 11.382V6Z"
-                  fill={taskText ? "white" : "#898989"}
-                />
-
-                <Path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 12.583 22.9546 13.1555 22.8673 13.714C22.7945 14.1789 22.7581 14.4114 22.6659 14.5191C22.5671 14.6346 22.4996 14.671 22.3488 14.69C22.2081 14.7078 21.8857 14.5612 21.2408 14.2678C20.8627 14.0958 20.4425 14 20 14C18.3431 14 17 15.3431 17 17C15.3431 17 14 18.3431 14 20C14 20.4425 14.0958 20.8627 14.2678 21.2408C14.5612 21.8857 14.7078 22.2081 14.69 22.3488C14.671 22.4996 14.6346 22.5671 14.5191 22.6659C14.4114 22.7581 14.1789 22.7945 13.714 22.8673C13.1555 22.9546 12.583 23 12 23C5.92487 23 1 18.0751 1 12ZM13 6C13 5.44772 12.5523 5 12 5C11.4477 5 11 5.44772 11 6V12C11 12.3788 11.214 12.725 11.5528 12.8944L15.5528 14.8944C16.0468 15.1414 16.6474 14.9412 16.8944 14.4472C17.1414 13.9532 16.9412 13.3526 16.4472 13.1056L13 11.382V6Z"
-                  fill={taskText ? "white" : "#898989"}
-                />
-                <Path
-                  d="M21 17C21 16.4477 20.5523 16 20 16C19.4477 16 19 16.4477 19 17V19H17C16.4477 19 16 19.4477 16 20C16 20.5523 16.4477 21 17 21H19V23C19 23.5523 19.4477 24 20 24C20.5523 24 21 23.5523 21 23V21H23C23.5523 21 24 20.5523 24 20C24 19.4477 23.5523 19 23 19H21V17Z"
-                  fill={taskText ? "white" : "#898989"}
-                />
-              </Svg>
+              <ClockIcon color={taskText ? "white" : "#898989"} />
             </TouchableOpacity>
 
-            <Pressable
+            <Button
               disabled={!taskText || !selectedCategory}
-              className={`flex-1 h-[60px] rounded-[12px] flex items-center justify-center ${
+              onPress={() => setShowTimePicker(true)}
+              className={`flex-1 rounded-[12px] ${
                 !taskText || !selectedCategory ? "bg-[#DEDEDE]" : "bg-[#393433]"
-              }`}
+              } items-center justify-center`}
             >
               <Text
                 className={`font-imedium text-[18px] ${
@@ -261,7 +243,7 @@ const Add = () => {
               >
                 Save
               </Text>
-            </Pressable>
+            </Button>
           </View>
         </View>
 

@@ -1,14 +1,9 @@
 import { useState } from "react";
-import Checkbox from "expo-checkbox";
-import { StatusBar } from "expo-status-bar";
-import Svg, { Path } from "react-native-svg";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, View, ScrollView, Pressable, Animated } from "react-native";
 import { router } from "expo-router";
-import {
-  Swipeable,
-  GestureHandlerRootView,
-} from "react-native-gesture-handler";
+import { StatusBar } from "expo-status-bar";
+import { Text, View, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Fab from "@/components/fab";
 import Todo from "@/components/todo";
