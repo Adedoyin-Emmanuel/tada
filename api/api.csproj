@@ -28,11 +28,4 @@
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Todos\CreateTodo\" />
-    <Folder Include="Features\Todos\DeleteTodo\" />
-    <Folder Include="Features\Todos\GetTodoById\" />
-    <Folder Include="Features\Todos\UpdateTodo\" />
-  </ItemGroup>
-
 </Project>
