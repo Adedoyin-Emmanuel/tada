@@ -1,26 +1,38 @@
+using Serilog;
 using Scalar.AspNetCore;
+using api.Infrastructure.Middlewares;
+using api.Infrastructure.Extensions.ApplicationBuilder;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+{
+    builder.Services
+        .AddCustomServices()
+        .AddApiDocsAndVersion()
+        .AddPersistence()
+        .AddAutomapperAndMediatR()
+        .AddHttpContextAccessor()
+        .AddControllers();
+    
+    builder.Host.AddCustomLogging();
+}
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
-    app.MapScalarApiReference();
-}
+    app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+    
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+        app.MapScalarApiReference();
+        
+    }
 
-app.UseHttpsRedirection();
+    app.UseSerilogRequestLogging();
+    app.UseHttpsRedirection();
+    app.UseAuthorization();
+    app.MapControllers();
+    app.Run();
+    
+};
 
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
