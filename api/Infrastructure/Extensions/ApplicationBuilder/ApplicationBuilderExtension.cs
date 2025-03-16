@@ -1,16 +1,15 @@
-using api.Application.Behaviours;
-using Scalar.AspNetCore;
+using MediatR;
+using Serilog;
+using api.Utils;
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using api.Application.Responses;
-using api.Infrastructure.Extensions.Services;
+using api.Application.Behaviours;
+using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Middlewares;
 using api.Infrastructure.Persistence;
 using api.Infrastructure.Repositories;
-using api.Utils;
-using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
+using api.Infrastructure.Extensions.Services;
 
 namespace api.Infrastructure.Extensions.ApplicationBuilder;
 

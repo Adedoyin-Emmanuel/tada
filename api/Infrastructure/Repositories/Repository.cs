@@ -10,10 +10,10 @@ public class Repository<T> : IRepository<T> where T : class, IBase
     private readonly AppDbContext _context;
 
 
-    public Repository(DbSet<T> dbSet, AppDbContext context)
+    public Repository(AppDbContext context)
     {
-        _dbSet = dbSet;
         _context = context;
+        _dbSet = _context.Set<T>();
     }
     
     
