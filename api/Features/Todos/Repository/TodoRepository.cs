@@ -1,7 +1,7 @@
 using api.Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
+using api.Infrastructure.Repositories;
 
-namespace api.Infrastructure.Repositories.Todo;
+namespace api.Features.Todos.Repository;
 
 public class TodoRepository : Repository<Domain.Entities.Todo.Todo>, ITodoRepository
 {

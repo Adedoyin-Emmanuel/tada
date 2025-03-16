@@ -5,6 +5,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using api.Application.Responses;
 using api.Application.Behaviours;
+using api.Features.Todos.Repository;
 using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Middlewares;
 using api.Infrastructure.Persistence;
@@ -19,6 +20,7 @@ public static  class ApplicationBuilderExtension
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<ITodoRepository, TodoRepository>();
         services.AddScoped<IResponse, Response>();
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehaviour<,>));
