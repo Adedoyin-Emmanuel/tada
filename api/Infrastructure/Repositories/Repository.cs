@@ -1,6 +1,6 @@
 using api.Domain.Entities.Base;
-using api.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using api.Infrastructure.Persistence;
 
 namespace api.Infrastructure.Repositories;
 
@@ -41,7 +41,7 @@ public class Repository<T> : IRepository<T> where T : class, IBase
         return await entityQuery.ToListAsync();
     }
 
-    public async Task<T> UpdateAsync(T entity)
+    public T Update(T entity)
     {
         var updatedEntity = _dbSet.Update(entity);
         

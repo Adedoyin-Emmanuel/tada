@@ -10,7 +10,7 @@ public interface IRepository<T> where T : class, IBase
     
     public Task<List<T>> GetAllAsync();
     
-    public Task<T> UpdateAsync(T entity);
+    public T Update(T entity);
     
     public Task<bool> DeleteAsync(Guid id);
 }
