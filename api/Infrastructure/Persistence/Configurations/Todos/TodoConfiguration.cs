@@ -17,7 +17,11 @@ public class TodoConfiguration : IEntityTypeConfiguration<Todo>
 
         builder.Property(todo => todo.IsDone).HasDefaultValue(false);
 
-        builder.HasMany(todo => todo.SubTodos);
+        builder.OwnsMany(todo => todo.SubTodos, subTodos =>
+        {
+            subTodos.Property(subTodo => subTodo.Title).IsRequired().HasMaxLength(100);
+            subTodos.Property(subTodo => subTodo.IsDone).HasDefaultValue(false);
+        });
 
         builder.Property(todo => todo.DueDate).IsRequired(false);
 
