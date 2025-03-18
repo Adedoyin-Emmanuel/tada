@@ -4,10 +4,10 @@ services:
       dockerfile: Dockerfile
     container_name: react_native_journey-mysql
     environment:
-      - MYSQL_USER=admin
-      - MYSQL_PASSWORD=admin@react_native_journey
-      - MYSQL_DATABASE=react_native_journey_db
-      - MYSQL_ROOT_PASSWORD=admin@react_native_journey
+      MYSQL_ROOT_PASSWORD: admin@react_native_journey
+      MYSQL_DATABASE: react_native_journey_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin@react_native_journey
     ports:
       - "3306:3306"
     volumes:

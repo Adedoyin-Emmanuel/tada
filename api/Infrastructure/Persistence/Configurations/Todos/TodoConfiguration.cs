@@ -19,6 +19,7 @@ public class TodoConfiguration : IEntityTypeConfiguration<Todo>
 
         builder.OwnsMany(todo => todo.SubTodos, subTodos =>
         {
+            subTodos.WithOwner().HasForeignKey("TodoId");
             subTodos.Property(subTodo => subTodo.Title).IsRequired().HasMaxLength(100);
             subTodos.Property(subTodo => subTodo.IsDone).HasDefaultValue(false);
         });

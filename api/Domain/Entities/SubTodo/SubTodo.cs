@@ -1,8 +1,8 @@
 namespace api.Domain.Entities.SubTodo;
 
-public class SubTodo
+public record SubTodo
 {
-    public bool IsDone { get; set; } = false;
     public string Title { get; set; }
-
+    public bool IsDone { get; set; }
+    
 }
