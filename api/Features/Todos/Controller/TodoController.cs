@@ -6,6 +6,7 @@ using api.Application.Responses;
 using api.Domain.Entities.SubTodo;
 using api.Features.Todos.CreateTodo;
 using System.Text.Json;
+using api.Features.Todos.GetAllTodos;
 
 namespace api.Features.Todos.Controller;
 
@@ -52,9 +53,9 @@ public class TodoController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetTodos()
+    public async Task<IActionResult> GetTodos([FromQuery] GetAllTodosQuery query)
     {
-        return Ok(_response.Ok());
+        return await HandleMediatorResult(_mediator.Send(query));
     }
 
     [HttpGet]

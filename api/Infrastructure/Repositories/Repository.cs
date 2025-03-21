@@ -1,13 +1,15 @@
+using api.Application.Common.IIdentifiable;
 using api.Domain.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Persistence;
+using api.Application.Common.PaginatedResult;
 
 namespace api.Infrastructure.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class, IBase
 {
     protected readonly DbSet<T> _dbSet;
-    private readonly AppDbContext _context;
+    protected readonly AppDbContext _context;
 
 
     public Repository(AppDbContext context)
@@ -28,18 +30,32 @@ public class Repository<T> : IRepository<T> where T : class, IBase
         return await _dbSet.FindAsync(id);
     }
 
-    public async Task<List<T>> GetAllAsync()
+    public async Task<PaginatedResult<T>> GetAllAsync(Guid? cursor, int? limit)
     {
-        var entityQuery = _dbSet.AsQueryable();
-        
-        
-        /*
-         * I might implement cursor / Key based pagination here
-         * Just to play with it and all. 
-         */
-        
-        return await entityQuery.ToListAsync();
+        var queryableEntity = _dbSet.AsQueryable();
+
+        var query = queryableEntity.OrderBy(entity => entity.Id);
+
+        if (cursor.HasValue && cursor.Value != Guid.Empty)
+        {
+            query = (IOrderedQueryable<T>)query.Where(entity => entity.Id > cursor.Value);
+        }
+
+        var items = limit.HasValue 
+            ? await query.Take(limit.Value).ToListAsync()
+            : await query.ToListAsync();
+
+        Guid? nextCursor = items.Any() ? items.Last().Id : null;
+
+        return new PaginatedResult<T>
+        {
+            Items = items,
+            NextCursor = nextCursor,
+            Limit = limit
+        };
     }
+
+
 
     public T Update(T entity)
     {
