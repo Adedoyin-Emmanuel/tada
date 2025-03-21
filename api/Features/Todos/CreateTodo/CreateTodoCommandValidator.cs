@@ -14,10 +14,8 @@ public class CreateTodoCommandValidator : AbstractValidator<CreateTodoCommand>
             .WithMessage("Title must not exceed 100 characters");
 
         RuleFor(todo => todo.Category)
-            .IsInEnum()
-            .WithMessage("Category must be a valid value: 0 (Health), 1 (Work), 2 (MentalHealth), or 3 (Others)")
-            .NotEmpty()
-            .WithMessage("Category is required. Valid values are: 0 (Health), 1 (Work), 2 (MentalHealth), or 3 (Others)");
+            .Must(category => Enum.IsDefined(typeof(Category), category))
+            .WithMessage(todo => $"Category value {(int)todo.Category} is not valid. Valid values are: 0 (Health), 1 (Work), 2 (MentalHealth), or 3 (Others)");
 
         RuleFor(todo => todo.SubTodos)
             .ForEach(subTodos =>
@@ -32,8 +30,5 @@ public class CreateTodoCommandValidator : AbstractValidator<CreateTodoCommand>
                 });
             })
             .When(todo => todo.SubTodos != null && todo.SubTodos.Any());
-
-        RuleFor(todo => todo.DueTime).NotEmpty().NotNull().When(todo => true)
-            .WithMessage("Due time is required");
     }
 } 

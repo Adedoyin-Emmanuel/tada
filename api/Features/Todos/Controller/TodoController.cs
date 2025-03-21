@@ -31,13 +31,9 @@ public class TodoController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateTodo(CreateTodoCommand command)
     {
-        if (command == null)
-        {
-            _logger.LogError("CreateTodoCommand is null");
-            return BadRequest(_response.BadRequest(new[] { "Invalid request payload" }));
-        }
-
-        Console.WriteLine(command);
+        _logger.LogInformation("Received CreateTodo request with Category: {Category} (Type: {CategoryType})", 
+            command.Category, 
+            command.Category.GetType().FullName);
         
         var createTodoResult = await _mediator.Send(command);
         

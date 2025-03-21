@@ -13,7 +13,9 @@ public class TodoConfiguration : IEntityTypeConfiguration<Todo>
 
         builder.Property(todo => todo.Title).IsRequired().HasMaxLength(100);
 
-        builder.Property(todo => todo.Category).HasDefaultValue(Category.Others);
+        builder.Property(todo => todo.Category)
+            .IsRequired()
+            .HasConversion<int>();
 
         builder.Property(todo => todo.IsDone).HasDefaultValue(false);
 

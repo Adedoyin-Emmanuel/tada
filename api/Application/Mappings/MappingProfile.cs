@@ -9,6 +9,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<CreateTodoCommand, Todo>();
-        CreateMap<Todo, CreateTodoCommandResponse>();
+        CreateMap<Todo, CreateTodoCommandResponse>()
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()));
     }
 }
