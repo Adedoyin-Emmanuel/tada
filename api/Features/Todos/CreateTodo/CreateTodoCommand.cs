@@ -9,6 +9,8 @@ public sealed record CreateTodoCommand : IRequest<Result<CreateTodoCommandRespon
 {
     public string Title { get; set; }
     public Category Category { get; set; } = Category.Others;
-    public ICollection<SubTodo> SubTodos { get; set; }
-    public DateTime? DueDate { get; set; }
+    
+    public ICollection<SubTodo>? SubTodos { get; set; }
+    public TimeOnly DueTime { get; set; }
+
 }

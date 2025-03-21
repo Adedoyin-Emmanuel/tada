@@ -49,9 +49,15 @@ public class GlobalExceptionHandlingMiddleware : IMiddleware
                 break;
             
             default:
+                
+                
+                Console.WriteLine("Inner exception");
+                
+                
                 context.Response.StatusCode = (int)StatusCodes.Status500InternalServerError;
 
                 var error = exception.Message;
+
                 
                 await context.Response.WriteAsJsonAsync(_response.InternalServerError(errors: null, message: EnvConfig.IsProduction ? "An unknown error occurred" : error));
                 

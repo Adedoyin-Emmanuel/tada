@@ -25,13 +25,14 @@ public static  class ApplicationBuilderExtension
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehaviour<,>));
 
+        services.AddTransient<GlobalExceptionHandlingMiddleware
+        >();
+        
         services.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressModelStateInvalidFilter = true;
         });
 
-        services.AddTransient<GlobalExceptionHandlingMiddleware
-        >();
 
         return services;
     }

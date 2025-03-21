@@ -9,8 +9,8 @@ public record CreateTodoCommandResponse
     public string Title { get; set; }
     public Category Category { get; set; }
     public bool IsDone { get; set; }
-    public ICollection<SubTodo> SubTodos { get; set; }
-    public DateTime DueDate { get; set; }
+    public List<SubTodo>? SubTodos { get; set; }
+    public TimeOnly? DueTime { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     

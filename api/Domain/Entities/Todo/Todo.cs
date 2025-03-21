@@ -10,7 +10,7 @@ public class Todo : IBase
     public Category Category { get; set; } = Category.Others;
     public bool IsDone { get; set; } = false;
     public ICollection<SubTodo.SubTodo> SubTodos { get; set; }
-    public DateTime? DueDate { get; set; }
+    public TimeOnly? DueTime { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     

@@ -24,7 +24,7 @@ public class TodoConfiguration : IEntityTypeConfiguration<Todo>
             subTodos.Property(subTodo => subTodo.IsDone).HasDefaultValue(false);
         });
 
-        builder.Property(todo => todo.DueDate).IsRequired(false);
+        builder.Property(todo => todo.DueTime).IsRequired(false);
 
         builder.Property(todo => todo.CreatedAt).ValueGeneratedOnAdd();
 
