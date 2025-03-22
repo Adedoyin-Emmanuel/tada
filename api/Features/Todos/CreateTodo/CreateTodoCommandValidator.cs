@@ -15,8 +15,8 @@ public class CreateTodoCommandValidator : AbstractValidator<CreateTodoCommand>
 
         RuleFor(todo => todo.Category)
             .Must(category => Enum.IsDefined(typeof(Category), category))
-            .WithMessage(todo => $"Category value {(int)todo.Category} is not valid. Valid values are: 0 (Health), 1 (Work), 2 (MentalHealth), or 3 (Others)");
-
+            .WithMessage(todo =>
+                $"Category value {(int)todo.Category} is not valid. Valid values are: 0 (Health), 1 (Work), 2 (MentalHealth), or 3 (Others)");
         RuleFor(todo => todo.SubTodos)
             .ForEach(subTodos =>
             {
@@ -30,5 +30,10 @@ public class CreateTodoCommandValidator : AbstractValidator<CreateTodoCommand>
                 });
             })
             .When(todo => todo.SubTodos != null && todo.SubTodos.Any());
+        
+        RuleFor(todo => todo.DueTime)
+            .Must(dueTime => dueTime > TimeOnly.FromDateTime(DateTime.UtcNow))
+            .WithMessage("DueTime must be in the future.").When(todo => todo.DueTime.HasValue);
+
     }
 } 

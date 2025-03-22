@@ -7,6 +7,7 @@ using api.Features.Todos.CreateTodo;
 using api.Features.Todos.GetAllTodos;
 using api.Features.Todos.GetTodoById;
 using api.Features.Todos.GetTodosHighlight;
+using api.Features.Todos.UpdateTodo;
 
 namespace api.Features.Todos.Controller;
 
@@ -81,11 +82,21 @@ public class TodoController : ControllerBase
         return await HandleMediatorResult(_mediator.Send(query));
     }
 
-    [HttpPut]
+    [HttpPatch]
     [Route("{id:guid}")]
-    public async Task<IActionResult> UpdateTodo(Guid id)
+    public async Task<IActionResult> UpdateTodo([FromBody] UpdateTodoCommand updateTodoCommand, [FromRoute] Guid id)
     {
-        return Ok(_response.Ok());
+        var command = updateTodoCommand with { Id = id };
+
+        var updateTodoResult = await _mediator.Send(command);
+
+        if (updateTodoResult.IsFailed)
+        {
+            var errors = updateTodoResult.Errors.Select(error => error.Message);
+            return NotFound(_response.NotFound(errors!.FirstOrDefault()!));
+        }
+
+        return Ok(_response.Ok(message: updateTodoResult?.Successes?.FirstOrDefault()!.Message!, data: updateTodoResult!.Value));
     }
 
     [HttpDelete]
