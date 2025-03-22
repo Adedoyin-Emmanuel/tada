@@ -4,6 +4,7 @@ using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using api.Application.Responses;
 using api.Features.Todos.CreateTodo;
+using api.Features.Todos.DeleteTodo;
 using api.Features.Todos.GetAllTodos;
 using api.Features.Todos.GetTodoById;
 using api.Features.Todos.GetTodosHighlight;
@@ -103,7 +104,17 @@ public class TodoController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> DeleteTodoById(Guid id)
     {
-        return Ok(_response.Ok());
+        var command = new DeleteTodoCommand { Id = id };
+
+        var deleteTodoResult = await _mediator.Send(command);
+
+        if (deleteTodoResult.IsFailed)
+        {
+            return NotFound(_response.NotFound("Todo with given Id not found"));
+        }
+
+
+        return Ok(_response.Ok(message: "Todo deleted successfully", data: null));
     }
     
 

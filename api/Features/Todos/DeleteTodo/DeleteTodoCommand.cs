@@ -1,6 +1,9 @@
+using MediatR;
+using FluentResults;
+
 namespace api.Features.Todos.DeleteTodo;
 
-public class DeleteTodoCommand
+public sealed record DeleteTodoCommand : IRequest<Result>
 {
-    
+    public Guid Id { get; set; }
 }
