@@ -1,6 +1,10 @@
+using MediatR;
+using FluentResults;
+using api.Domain.Entities.Todo;
+
 namespace api.Features.Todos.GetTodoById;
 
-public class GetTodoByIdQuery
+public record GetTodoByIdQuery : IRequest<Result<Todo>>
 {
-    
+    public Guid Id { get; set; }
 }

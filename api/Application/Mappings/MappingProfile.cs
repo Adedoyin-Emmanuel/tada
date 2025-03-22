@@ -11,5 +11,6 @@ public class MappingProfile : Profile
         CreateMap<CreateTodoCommand, Todo>();
         CreateMap<Todo, CreateTodoCommandResponse>()
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()));
+        
     }
 }

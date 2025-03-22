@@ -3,10 +3,9 @@ using FluentResults;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
 using api.Application.Responses;
-using api.Domain.Entities.SubTodo;
 using api.Features.Todos.CreateTodo;
-using System.Text.Json;
 using api.Features.Todos.GetAllTodos;
+using api.Features.Todos.GetTodoById;
 
 namespace api.Features.Todos.Controller;
 
@@ -62,8 +61,16 @@ public class TodoController : ControllerBase
     [Route("{id:guid}")]
     public async Task<IActionResult> GetTodoById(Guid id)
     {
-        return Ok(_response.Ok());
+        var query = new GetTodoByIdQuery { Id = id };
 
+        var getTodoByIdResult = await _mediator.Send(query);
+
+        if (getTodoByIdResult.IsFailed)
+        {
+            return NotFound(_response.NotFound(getTodoByIdResult.Errors.FirstOrDefault()!.Message));
+        }
+
+        return Ok(_response.Ok(getTodoByIdResult.ValueOrDefault));
     }
 
     [HttpPut]

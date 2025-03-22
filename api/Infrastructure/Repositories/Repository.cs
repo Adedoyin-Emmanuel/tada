@@ -1,4 +1,3 @@
-using api.Application.Common.IIdentifiable;
 using api.Domain.Entities.Base;
 using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Persistence;
