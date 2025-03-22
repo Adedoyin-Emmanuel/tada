@@ -26,6 +26,7 @@
     <PackageReference Include="NRedisStack" Version="0.13.2" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.0.34" />
+    <PackageReference Include="Scrutor" Version="6.0.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
   </ItemGroup>
 

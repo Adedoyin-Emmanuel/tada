@@ -11,6 +11,7 @@ using api.Infrastructure.Middlewares;
 using api.Infrastructure.Persistence;
 using api.Infrastructure.Repositories;
 using api.Infrastructure.Extensions.Services;
+using api.Infrastructure.Services.Caching;
 
 namespace api.Infrastructure.Extensions.ApplicationBuilder;
 
@@ -19,6 +20,7 @@ public static  class ApplicationBuilderExtension
     public static IServiceCollection AddCustomServices(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<ITodoRepository, TodoRepository>();
         services.AddScoped<IResponse, Response>();
@@ -33,6 +35,7 @@ public static  class ApplicationBuilderExtension
             options.SuppressModelStateInvalidFilter = true;
         });
 
+        services.AddScoped<IRedisCacheService, RedisCacheService>();
 
         return services;
     }
