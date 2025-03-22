@@ -1,6 +1,5 @@
 using MediatR;
 using FluentResults;
-using api.Domain.Entities.Todo;
 
 namespace api.Features.Todos.GetTodoById;
 

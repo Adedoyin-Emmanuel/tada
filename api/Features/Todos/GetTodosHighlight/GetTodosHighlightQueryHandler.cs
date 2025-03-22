@@ -1,6 +1,6 @@
 namespace api.Features.Todos.GetTodoHighlight;
 
-public class GetTodoHighlightQueryHandler
+public class GetTodosHighlightQueryHandler
 {
     
 }

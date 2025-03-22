@@ -1,6 +1,5 @@
 using MediatR;
 using FluentResults;
-using api.Domain.Entities.Todo;
 using api.Application.Common.PaginatedResult;
 
 namespace api.Features.Todos.GetAllTodos;
