@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using api.Application.Responses;
 using api.Features.Todos.CreateTodo;
 using api.Features.Todos.DeleteTodo;
-using api.Features.Todos.GetAllTodos;
-using api.Features.Todos.GetTodoById;
-using api.Features.Todos.GetTodosHighlight;
 using api.Features.Todos.UpdateTodo;
+using api.Features.Todos.GetTodoById;
+using api.Features.Todos.GetAllTodos;
+using api.Features.Todos.GetTodosHighlight;
 
 namespace api.Features.Todos.Controller;
 

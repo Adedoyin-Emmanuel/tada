@@ -1,5 +1,5 @@
-using api.Application.Common.CategoryDetails;
 using api.Infrastructure.Repositories;
+using api.Application.Common.CategoryDetails;
 
 namespace api.Features.Todos.Repository;
 

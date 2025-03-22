@@ -1,4 +1,3 @@
-using api.Domain.Constants.Category;
 using api.Domain.Entities.Todo;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

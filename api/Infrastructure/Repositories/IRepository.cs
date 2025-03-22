@@ -1,5 +1,5 @@
-using api.Application.Common.PaginatedResult;
 using api.Domain.Entities.Base;
+using api.Application.Common.PaginatedResult;
 
 namespace api.Infrastructure.Repositories;
 
