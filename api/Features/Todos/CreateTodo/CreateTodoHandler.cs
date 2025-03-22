@@ -1,9 +1,9 @@
-using api.Domain.Entities.Todo;
-using api.Features.Todos.Repository;
 using MediatR;
 using AutoMapper;
 using FluentResults;
 using FluentValidation;
+using api.Domain.Entities.Todo;
+using api.Features.Todos.Repository;
 using api.Infrastructure.Repositories;
 
 namespace api.Features.Todos.CreateTodo;

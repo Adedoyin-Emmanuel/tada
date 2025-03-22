@@ -6,6 +6,7 @@ using api.Application.Responses;
 using api.Features.Todos.CreateTodo;
 using api.Features.Todos.GetAllTodos;
 using api.Features.Todos.GetTodoById;
+using api.Features.Todos.GetTodosHighlight;
 
 namespace api.Features.Todos.Controller;
 
@@ -71,6 +72,13 @@ public class TodoController : ControllerBase
         }
 
         return Ok(_response.Ok(getTodoByIdResult.ValueOrDefault));
+    }
+
+    [HttpGet]
+    [Route("highlight")]
+    public async Task<IActionResult> GetTodosHighlight([FromQuery] GetTodosHighlightQuery query)
+    {
+        return await HandleMediatorResult(_mediator.Send(query));
     }
 
     [HttpPut]

@@ -1,6 +1,9 @@
-namespace api.Features.Todos.GetTodoHighlight;
+using MediatR;
+using FluentResults;
 
-public class GetTodosHighlightQuery
+namespace api.Features.Todos.GetTodosHighlight;
+
+public class GetTodosHighlightQuery : IRequest<Result<GetTodosHighlightQueryResponse>>
 {
     
 }
