@@ -4,7 +4,7 @@ using api.Domain.Entities.Todo;
 
 namespace api.Features.Todos.GetTodoById;
 
-public record GetTodoByIdQuery : IRequest<Result<Todo>>
+public record GetTodoByIdQuery : IRequest<Result<GetTodoByIdQueryResponse>>
 {
     public Guid Id { get; set; }
 }

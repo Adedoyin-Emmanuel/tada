@@ -1,6 +1,7 @@
 using AutoMapper;
 using api.Domain.Entities.Todo;
 using api.Features.Todos.CreateTodo;
+using api.Features.Todos.GetTodoById;
 
 namespace api.Application.Mappings;
 
@@ -11,6 +12,7 @@ public class MappingProfile : Profile
         CreateMap<CreateTodoCommand, Todo>();
         CreateMap<Todo, CreateTodoCommandResponse>()
             .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()));
-        
+        CreateMap<Todo, GetTodoByIdQueryResponse>()
+            .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.ToString()));
     }
 }
