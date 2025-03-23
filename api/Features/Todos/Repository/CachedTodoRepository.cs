@@ -10,6 +10,12 @@ public class CachedTodoRepository : ITodoRepository
     private readonly ITodoRepository _innerRepository;
     private readonly IRedisCacheService _cache;
 
+    public CachedTodoRepository(ITodoRepository innerRepository, IRedisCacheService cache)
+    {
+        _cache = cache;
+        _innerRepository = innerRepository;
+    }
+
 
     public async Task<Todo?> CreateAsync(Todo entity)
     {

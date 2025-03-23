@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using api.Infrastructure.Middlewares;
 using api.Infrastructure.Persistence;
 using api.Infrastructure.Repositories;
-using api.Infrastructure.Extensions.Services;
 using api.Infrastructure.Services.Caching;
+using api.Infrastructure.Extensions.Services;
 
 namespace api.Infrastructure.Extensions.ApplicationBuilder;
 
@@ -22,7 +22,11 @@ public static  class ApplicationBuilderExtension
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        
         services.AddScoped<ITodoRepository, TodoRepository>();
+
+        services.Decorate<ITodoRepository, CachedTodoRepository>();
+        
         services.AddScoped<IResponse, Response>();
 
         services.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehaviour<,>));
