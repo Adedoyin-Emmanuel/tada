@@ -75,7 +75,9 @@ const CategorySection = ({ isLoading, data }: CategorySectionProps) => {
           icon: "Others",
           bgClassName: "bg-others-light",
         },
-      ];
+    ];
+  
+  console.log()
 
   return (
     <View className="flex-1 w-full mt-10 flex-row flex-wrap gap-4">

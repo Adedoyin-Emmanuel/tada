@@ -2,20 +2,19 @@ import { useState } from "react";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useQuery } from "@tanstack/react-query";
-import { Text, View, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Text, View, ScrollView, RefreshControl } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Fab from "@/components/fab";
 import Todo from "@/components/todo";
-import { toast } from "@/components/toast";
 import { getDate } from "@/utils/get-date";
-import { CategoryIcons } from "@/constants/icons";
-import CategoryCard from "@/components/category-card";
-import { getTodoHighlight } from "@/app/services/todo/get-highlight";
+import { toast } from "@/components/toast";
 import CategorySection from "@/components/category-section";
+import { getTodoHighlight } from "@/app/services/todo/get-highlight";
 
 const Home = () => {
+  const [refreshing, setRefreshing] = useState(false);
   const [todos, setTodos] = useState([
     {
       id: "1",
@@ -70,7 +69,7 @@ const Home = () => {
   ]);
 
   const handleTodoClick = () => {
-    //toast.success("Operation successful!");
+    toast.success("Operation successful!");
     //router.push("/view-task");
   };
 
@@ -101,17 +100,52 @@ const Home = () => {
     isLoading,
     isError,
     error,
+    refetch,
+    isFetching,
   } = useQuery({
     queryKey: ["get-todo-highlight"],
     queryFn: getTodoHighlight,
+    refetchOnWindowFocus: true,
+    retry: 1,
+    select: (apiResponse) => {
+      const transformed = {
+        health: apiResponse.data.healthCategoryTotal,
+        work: apiResponse.data.workCategoryTotal,
+        mentalHealth: apiResponse.data.mentalHealthCategoryTotal,
+        others: apiResponse.data.othersCategoryTotal,
+      };
+      return transformed;
+    },
   });
 
-  console.log(todoHighlight);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refetch();
+    } catch (error) {
+      toast.error("Failed to refresh. Please try again.");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  if (isError) {
+    console.log(error);
+    toast.error(`${error.message}`);
+  }
 
   return (
     <SafeAreaView className="h-full bg-white">
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <ScrollView>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing || isFetching}
+              onRefresh={onRefresh}
+              tintColor="#393433"
+            />
+          }
+        >
           <View className="w-full p-5">
             <Text className="font-ibold text-[36px]">
               Today{" "}
