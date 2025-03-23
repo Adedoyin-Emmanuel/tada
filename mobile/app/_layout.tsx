@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen } from "expo-router";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "@/app/config/toast";
 
 import "./../global.css";
 
@@ -25,23 +27,26 @@ export default function RootLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <Stack>
-      <Stack.Screen
-        name="index"
-        options={{
-          headerShown: false,
-        }}
-      />
+    <>
+      <Stack>
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-      <Stack.Screen name="add" options={{ headerShown: false }} />
+        <Stack.Screen name="add" options={{ headerShown: false }} />
 
-      <Stack.Screen
-        name="view-task"
-        options={{
-          headerShown: false,
-          presentation: "modal",
-        }}
-      />
-    </Stack>
+        <Stack.Screen
+          name="view-task"
+          options={{
+            headerShown: false,
+            presentation: "modal",
+          }}
+        />
+      </Stack>
+      <Toast config={toastConfig} />
+    </>
   );
 }

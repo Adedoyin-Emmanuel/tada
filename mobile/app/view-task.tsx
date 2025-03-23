@@ -2,14 +2,27 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Checkbox } from "expo-checkbox";
 import { StatusBar } from "expo-status-bar";
+import { Text, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, View, ScrollView, Pressable } from "react-native";
+import Toast from "react-native-toast-message";
 
 import Cancel from "@/components/cancel";
+import Button from "@/components/button";
 
 const ViewTask = () => {
   const handleClose = () => {
-    router.dismiss();
+    //router.dismiss();
+
+    Toast.show({
+      type: "success",
+      text2: "Changes saved successfully",
+      position: "top",
+      visibilityTime: 2000,
+      topOffset: 0,
+      props: {
+        onPress: () => Toast.hide(),
+      },
+    });
   };
 
   const [todos, setTodos] = useState([
@@ -91,13 +104,9 @@ const ViewTask = () => {
             </View>
           </View>
 
-          <Pressable
-            className={
-              "bg-[#393433] h-[60px] rounded-[12px] flex items-center justify-center active:opacity-90 mt-10"
-            }
-          >
+          <Button onPress={handleClose} className="mt-10">
             <Text className="text-white font-imedium text-[18px]">Save</Text>
-          </Pressable>
+          </Button>
         </View>
       </ScrollView>
       <StatusBar />
