@@ -4,10 +4,10 @@ import { Checkbox } from "expo-checkbox";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { toast } from "@/app/config/toast";
 
 import Cancel from "@/components/cancel";
 import Button from "@/components/button";
+import { toast } from "@/components/toast";
 
 const ViewTask = () => {
   const handleClose = () => {

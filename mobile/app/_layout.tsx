@@ -1,9 +1,9 @@
 import { useEffect } from "react";
-import { useFonts } from "expo-font";
-import { Stack, SplashScreen } from "expo-router";
 import { View } from "react-native";
+import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import { FlashMessageComponent } from "@/app/config/toast";
+import { Stack, SplashScreen } from "expo-router";
+import { FlashMessageComponent } from "@/components/toast";
 
 import "./../global.css";
 

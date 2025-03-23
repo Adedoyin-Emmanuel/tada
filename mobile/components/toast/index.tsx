@@ -1,140 +1,90 @@
-import React from "react";
-import { Animated, Text, View, StyleSheet } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
+import FlashMessage, {
+  showMessage,
+  MessageComponentProps,
+} from "react-native-flash-message";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Dimensions, Platform, View, Text } from "react-native";
 
-export type ToastType = "success" | "error" | "warning" | "info";
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const STATUSBAR_HEIGHT = Platform.OS === "ios" ? 45 : 0;
 
-interface ToastProps {
-  message: string;
-  type: ToastType;
-  isVisible: boolean;
-  onHide: () => void;
-}
+const CustomMessage = ({ message }: MessageComponentProps) => (
+  <View
+    style={[styles.container, { backgroundColor: message.backgroundColor }]}
+  >
+    <StatusBar style="light" />
+    <Text style={styles.message}>{message.message}</Text>
+  </View>
+);
 
-const Toast: React.FC<ToastProps> = ({ message, type, isVisible, onHide }) => {
-  const translateY = React.useRef(new Animated.Value(-100)).current;
-  const opacity = React.useRef(new Animated.Value(0)).current;
+export const FlashMessageComponent = () => (
+  <FlashMessage
+    position="top"
+    floating={false}
+    duration={2000}
+    animated={true}
+    renderFlashMessageIcon={() => null}
+    MessageComponent={CustomMessage}
+  />
+);
 
-  React.useEffect(() => {
-    if (isVisible) {
-      Animated.parallel([
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ]).start();
+export const toast = {
+  success: (message: string) =>
+    showMessage({
+      message,
+      type: "success",
+      duration: 2000,
+      backgroundColor: "#4CAF50",
+      animated: true,
+      icon: "none",
+    }),
 
-      // Auto hide after 3 seconds
-      const timer = setTimeout(() => {
-        hideToast();
-      }, 3000);
+  error: (message: string) =>
+    showMessage({
+      message,
+      type: "danger",
+      duration: 2000,
+      backgroundColor: "#F44336",
+      animated: true,
+      icon: "none",
+    }),
 
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible]);
+  info: (message: string) =>
+    showMessage({
+      message,
+      type: "info",
+      duration: 2000,
+      backgroundColor: "#2196F3",
+      animated: true,
+      icon: "none",
+    }),
 
-  const hideToast = () => {
-    Animated.parallel([
-      Animated.timing(translateY, {
-        toValue: -100,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onHide();
-    });
-  };
-
-  const getToastStyle = () => {
-    switch (type) {
-      case "success":
-        return { backgroundColor: "#4CAF50" };
-      case "error":
-        return { backgroundColor: "#F44336" };
-      case "warning":
-        return { backgroundColor: "#FFC107" };
-      case "info":
-        return { backgroundColor: "#2196F3" };
-      default:
-        return { backgroundColor: "#333" };
-    }
-  };
-
-  const getIcon = () => {
-    switch (type) {
-      case "success":
-        return "checkcircle";
-      case "error":
-        return "closecircle";
-      case "warning":
-        return "warning";
-      case "info":
-        return "infocirlce";
-      default:
-        return "infocirlce";
-    }
-  };
-
-  if (!isVisible) return null;
-
-  return (
-    <Animated.View
-      style={[
-        styles.container,
-        getToastStyle(),
-        {
-          transform: [{ translateY }],
-          opacity,
-        },
-      ]}
-    >
-      <View style={styles.content}>
-        <AntDesign name={getIcon()} size={24} color="white" />
-        <Text style={styles.message}>{message}</Text>
-      </View>
-    </Animated.View>
-  );
+  warning: (message: string) =>
+    showMessage({
+      message,
+      type: "warning",
+      duration: 2000,
+      backgroundColor: "#FFC107",
+      animated: true,
+      icon: "none",
+    }),
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    top: 50,
-    left: 20,
-    right: 20,
-    padding: 16,
-    borderRadius: 8,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    zIndex: 9999,
-  },
-  content: {
-    flexDirection: "row",
+    width: SCREEN_WIDTH,
+    minHeight: 35,
+    paddingVertical: 8,
+    paddingTop: STATUSBAR_HEIGHT + 6,
     alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 0,
   },
   message: {
-    color: "white",
-    marginLeft: 10,
-    fontSize: 16,
-    fontWeight: "500",
+    fontSize: 15,
+    color: "#FFFFFF",
+    marginTop: 10,
+    fontFamily: "Inter-SemiBold",
+    textAlign: "left",
   },
 });
-
-export default Toast;

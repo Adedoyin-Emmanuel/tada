@@ -7,9 +7,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Fab from "@/components/fab";
 import Todo from "@/components/todo";
+import { toast } from "@/components/toast";
 import { CategoryIcons } from "@/constants/icons";
 import CategoryCard from "@/components/category-card";
-import { toast } from "@/app/config/toast";
 
 const Home = () => {
   const [todos, setTodos] = useState([
@@ -66,7 +66,7 @@ const Home = () => {
   ]);
 
   const handleTodoClick = () => {
-    toast.success("Operation successful!");
+    //toast.success("Operation successful!");
     //router.push("/view-task");
   };
 
