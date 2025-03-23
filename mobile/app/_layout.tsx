@@ -3,6 +3,8 @@ import { View } from "react-native";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { Stack, SplashScreen } from "expo-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { FlashMessageComponent } from "@/components/toast";
 
 import "./../global.css";
@@ -27,28 +29,32 @@ export default function RootLayout() {
 
   if (!fontsLoaded && !error) return null;
 
+  const queryClient = new QueryClient();
+
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar style="dark" />
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{
-            headerShown: false,
-          }}
-        />
+    <QueryClientProvider client={queryClient}>
+      <View style={{ flex: 1 }}>
+        <StatusBar style="dark" />
+        <Stack>
+          <Stack.Screen
+            name="index"
+            options={{
+              headerShown: false,
+            }}
+          />
 
-        <Stack.Screen name="add" options={{ headerShown: false }} />
+          <Stack.Screen name="add" options={{ headerShown: false }} />
 
-        <Stack.Screen
-          name="view-task"
-          options={{
-            headerShown: false,
-            presentation: "modal",
-          }}
-        />
-      </Stack>
-      <FlashMessageComponent />
-    </View>
+          <Stack.Screen
+            name="view-task"
+            options={{
+              headerShown: false,
+              presentation: "modal",
+            }}
+          />
+        </Stack>
+        <FlashMessageComponent />
+      </View>
+    </QueryClientProvider>
   );
 }

@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Text, View, ScrollView } from "react-native";
+import { useQuery } from "@tanstack/react-query";
+import { Text, View, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Fab from "@/components/fab";
 import Todo from "@/components/todo";
 import { toast } from "@/components/toast";
+import { getDate } from "@/utils/get-date";
 import { CategoryIcons } from "@/constants/icons";
 import CategoryCard from "@/components/category-card";
+import { getTodoHighlight } from "@/app/services/todo/get-highlight";
+import CategorySection from "@/components/category-section";
 
 const Home = () => {
   const [todos, setTodos] = useState([
@@ -92,44 +96,29 @@ const Home = () => {
     );
   };
 
+  const {
+    data: todoHighlight,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["get-todo-highlight"],
+    queryFn: getTodoHighlight,
+  });
+
+  console.log(todoHighlight);
+
   return (
     <SafeAreaView className="h-full bg-white">
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ScrollView>
           <View className="w-full p-5">
             <Text className="font-ibold text-[36px]">
-              Today <Text className="font-imedium opacity-[30%]">14 Mar</Text>
+              Today{" "}
+              <Text className="font-imedium opacity-[30%]">{getDate()}</Text>
             </Text>
 
-            <View className="flex-1 w-full mt-10 flex-row flex-wrap gap-4">
-              <CategoryCard
-                title="Health"
-                count={6}
-                icon={<CategoryIcons.Health />}
-                bgClassName="bg-health-light"
-              />
-
-              <CategoryCard
-                title="Health"
-                count={5}
-                icon={<CategoryIcons.Work />}
-                bgClassName="bg-work-light"
-              />
-
-              <CategoryCard
-                title="Mental Health"
-                count={4}
-                icon={<CategoryIcons.MentalHealth />}
-                bgClassName="bg-mentalHealth-light"
-              />
-
-              <CategoryCard
-                title="Others"
-                count={13}
-                icon={<CategoryIcons.Others />}
-                bgClassName="bg-others-light"
-              />
-            </View>
+            <CategorySection isLoading={isLoading} data={todoHighlight} />
 
             <View className="w-full mt-10">
               <View>
