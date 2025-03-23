@@ -1,109 +1,90 @@
-import { BaseToast, ErrorToast, InfoToast } from "react-native-toast-message";
-import { StyleSheet, Dimensions, Platform } from "react-native";
+import FlashMessage, {
+  showMessage,
+  MessageComponentProps,
+} from "react-native-flash-message";
+import { StatusBar } from "expo-status-bar";
+import { StyleSheet, Dimensions, Platform, View, Text } from "react-native";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const STATUSBAR_HEIGHT = Platform.OS === "ios" ? 45 : 0;
 
-export const toastConfig = {
-  success: (props: any) => (
-    <BaseToast
-      {...props}
-      style={[styles.base, styles.success]}
-      contentContainerStyle={styles.contentContainer}
-      text1Style={styles.hidden}
-      text2Style={styles.message}
-      text1NumberOfLines={0}
-      text2NumberOfLines={2}
-      renderLeadingIcon={() => null}
-    />
-  ),
-  error: (props: any) => (
-    <ErrorToast
-      {...props}
-      style={[styles.base, styles.error]}
-      contentContainerStyle={styles.contentContainer}
-      text1Style={styles.hidden}
-      text2Style={styles.message}
-      text1NumberOfLines={0}
-      text2NumberOfLines={2}
-      renderLeadingIcon={() => null}
-    />
-  ),
-  info: (props: any) => (
-    <InfoToast
-      {...props}
-      style={[styles.base, styles.info]}
-      contentContainerStyle={styles.contentContainer}
-      text1Style={styles.hidden}
-      text2Style={styles.message}
-      text1NumberOfLines={0}
-      text2NumberOfLines={2}
-      renderLeadingIcon={() => null}
-    />
-  ),
-  warning: (props: any) => (
-    <BaseToast
-      {...props}
-      style={[styles.base, styles.warning]}
-      contentContainerStyle={styles.contentContainer}
-      text1Style={styles.hidden}
-      text2Style={styles.message}
-      text1NumberOfLines={0}
-      text2NumberOfLines={2}
-      renderLeadingIcon={() => null}
-    />
-  ),
+const CustomMessage = ({ message }: MessageComponentProps) => (
+  <View
+    style={[styles.container, { backgroundColor: message.backgroundColor }]}
+  >
+    <StatusBar style="light" />
+    <Text style={styles.message}>{message.message}</Text>
+  </View>
+);
+
+export const FlashMessageComponent = () => (
+  <FlashMessage
+    position="top"
+    floating={false}
+    duration={2000}
+    animated={true}
+    renderFlashMessageIcon={() => null}
+    MessageComponent={CustomMessage}
+  />
+);
+
+export const toast = {
+  success: (message: string) =>
+    showMessage({
+      message,
+      type: "success",
+      duration: 2000,
+      backgroundColor: "#4CAF50",
+      animated: true,
+      icon: "none",
+    }),
+
+  error: (message: string) =>
+    showMessage({
+      message,
+      type: "danger",
+      duration: 2000,
+      backgroundColor: "#F44336",
+      animated: true,
+      icon: "none",
+    }),
+
+  info: (message: string) =>
+    showMessage({
+      message,
+      type: "info",
+      duration: 2000,
+      backgroundColor: "#2196F3",
+      animated: true,
+      icon: "none",
+    }),
+
+  warning: (message: string) =>
+    showMessage({
+      message,
+      type: "warning",
+      duration: 2000,
+      backgroundColor: "#FFC107",
+      animated: true,
+      icon: "none",
+    }),
 };
 
 const styles = StyleSheet.create({
-  base: {
+  container: {
     width: SCREEN_WIDTH,
-    borderLeftWidth: 0,
-    height: "auto",
-    minHeight: 55,
+    minHeight: 35,
     paddingVertical: 8,
-    paddingTop: STATUSBAR_HEIGHT + 8,
-    marginTop: 0,
-    borderRadius: 0,
-    elevation: 10,
-    zIndex: 999999,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    position: "absolute",
-    top: 0,
-    left: 0,
-  },
-  contentContainer: {
-    flex: 1,
-    justifyContent: "center",
+    paddingTop: STATUSBAR_HEIGHT + 6,
     alignItems: "center",
-    paddingHorizontal: 16,
-  },
-  hidden: {
-    display: "none",
-    height: 0,
+    justifyContent: "center",
+    borderRadius: 0,
   },
   message: {
     fontSize: 15,
     color: "#FFFFFF",
-    fontFamily: "Inter-Medium",
-    textAlign: "center",
-  },
-  success: {
-    backgroundColor: "#4CAF50",
-  },
-  error: {
-    backgroundColor: "#F44336",
-  },
-  info: {
-    backgroundColor: "#2196F3",
-  },
-  warning: {
-    backgroundColor: "#FFC107",
+    marginTop: 10,
+    fontFamily: "Inter-SemiBold",
+    textAlign: "left",
   },
 });

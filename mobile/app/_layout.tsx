@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { useFonts } from "expo-font";
 import { Stack, SplashScreen } from "expo-router";
-import Toast from "react-native-toast-message";
-import { toastConfig } from "@/app/config/toast";
+import { View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import { FlashMessageComponent } from "@/app/config/toast";
 
 import "./../global.css";
 
@@ -27,7 +28,8 @@ export default function RootLayout() {
   if (!fontsLoaded && !error) return null;
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
+      <StatusBar style="dark" />
       <Stack>
         <Stack.Screen
           name="index"
@@ -46,7 +48,7 @@ export default function RootLayout() {
           }}
         />
       </Stack>
-      <Toast config={toastConfig} />
-    </>
+      <FlashMessageComponent />
+    </View>
   );
 }

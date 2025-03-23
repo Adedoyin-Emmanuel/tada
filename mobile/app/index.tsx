@@ -9,7 +9,7 @@ import Fab from "@/components/fab";
 import Todo from "@/components/todo";
 import { CategoryIcons } from "@/constants/icons";
 import CategoryCard from "@/components/category-card";
-import Toast from "react-native-toast-message";
+import { toast } from "@/app/config/toast";
 
 const Home = () => {
   const [todos, setTodos] = useState([
@@ -66,17 +66,7 @@ const Home = () => {
   ]);
 
   const handleTodoClick = () => {
-    Toast.show({
-      type: "success",
-      text1: "Success",
-      text2: "Something good will happen",
-      position: "top",
-      visibilityTime: 4000,
-      topOffset: 0,
-      props: {
-        onPress: () => Toast.hide(),
-      },
-    });
+    toast.success("Operation successful!");
     //router.push("/view-task");
   };
 

@@ -4,7 +4,7 @@ import { Checkbox } from "expo-checkbox";
 import { StatusBar } from "expo-status-bar";
 import { Text, View, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Toast from "react-native-toast-message";
+import { toast } from "@/app/config/toast";
 
 import Cancel from "@/components/cancel";
 import Button from "@/components/button";
@@ -12,17 +12,7 @@ import Button from "@/components/button";
 const ViewTask = () => {
   const handleClose = () => {
     //router.dismiss();
-
-    Toast.show({
-      type: "success",
-      text2: "Changes saved successfully",
-      position: "top",
-      visibilityTime: 2000,
-      topOffset: 0,
-      props: {
-        onPress: () => Toast.hide(),
-      },
-    });
+    toast.success("Your changes have been saved successfully!");
   };
 
   const [todos, setTodos] = useState([
