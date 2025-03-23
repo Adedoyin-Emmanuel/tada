@@ -109,10 +109,10 @@ const Home = () => {
     retry: 1,
     select: (apiResponse) => {
       const transformed = {
-        health: apiResponse.data.healthCategoryTotal,
         work: apiResponse.data.workCategoryTotal,
-        mentalHealth: apiResponse.data.mentalHealthCategoryTotal,
+        health: apiResponse.data.healthCategoryTotal,
         others: apiResponse.data.othersCategoryTotal,
+        mentalHealth: apiResponse.data.mentalHealthCategoryTotal,
       };
       return transformed;
     },
@@ -130,7 +130,6 @@ const Home = () => {
   };
 
   if (isError) {
-    console.log(error);
     toast.error(`${error.message}`);
   }
 
