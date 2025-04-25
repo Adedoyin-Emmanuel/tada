@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -181,10 +181,20 @@ const Home = () => {
     }
   }, [nextCursor, hasMore, isLoadingMore]);
 
+  // Create a memoized version of allTodos with guaranteed unique IDs
+  const uniqueTodos = useMemo(() => {
+    // Create a Map to deduplicate todos by ID
+    const todosMap = new Map();
+    allTodos.forEach((todo) => {
+      todosMap.set(todo.id, todo);
+    });
+    // Convert back to array
+    return Array.from(todosMap.values());
+  }, [allTodos]);
+
   const renderTodoItem = ({ item }: { item: ITransformedTodo }) => (
-    <View className="px-5">
+    <View className="px-5 mb-2">
       <Todo
-        key={item.id}
         id={item.id}
         title={item.title}
         category={item.category}
@@ -209,14 +219,21 @@ const Home = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setAllTodos([]);
-    setNextCursor(null);
-    setHasMore(true);
 
     try {
+      // Reset state before fetching new data
+      setAllTodos([]);
+      setNextCursor(null);
+      setHasMore(true);
+
+      // Fetch fresh data
       await Promise.all([refetchHighlight(), refetchTodos()]);
+
+      // React Query automatically updates the todosData state
+      // which will trigger the useEffect that updates allTodos
     } catch (error) {
       toast.error("Failed to refresh. Please try again.");
+      console.error("Refresh error:", error);
     } finally {
       setRefreshing(false);
     }
@@ -237,9 +254,27 @@ const Home = () => {
 
   useEffect(() => {
     if (todosData) {
-      setAllTodos(todosData.items);
-      setNextCursor(todosData.nextCursor);
-      setHasMore(!!todosData.nextCursor);
+      console.log("Todos data updated:", todosData);
+      try {
+        // Check for duplicates before setting state
+        const uniqueItems = todosData.items || [];
+        const uniqueIds = new Set();
+        const filteredItems = uniqueItems.filter((item) => {
+          if (uniqueIds.has(item.id)) {
+            console.log("Duplicate ID found:", item.id);
+            return false;
+          }
+          uniqueIds.add(item.id);
+          return true;
+        });
+
+        setAllTodos(filteredItems);
+        setNextCursor(todosData.nextCursor);
+        setHasMore(!!todosData.nextCursor);
+      } catch (error) {
+        console.error("Error processing todos data:", error);
+        toast.error("Error loading todos data");
+      }
     }
   }, [todosData]);
 
@@ -256,21 +291,23 @@ const Home = () => {
   return (
     <SafeAreaView className="h-full bg-white">
       <GestureHandlerRootView style={{ flex: 1 }}>
-        {isTodoLoading && !allTodos.length ? (
+        {isTodoLoading && !uniqueTodos.length ? (
           <View className="flex-1 justify-center items-center">
             <ActivityIndicator size="large" color="#393433" />
           </View>
         ) : (
           <FlatList
-            data={allTodos}
+            data={uniqueTodos}
             renderItem={renderTodoItem}
             keyExtractor={(item) => item.id}
+            extraData={refreshing}
             ListHeaderComponent={renderHeader}
             ListFooterComponent={renderFooter}
             contentContainerStyle={{ paddingBottom: 80 }}
             onEndReached={fetchMoreTodos}
             onEndReachedThreshold={0.5}
             className="w-full"
+            removeClippedSubviews={false}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing || isHighlightFetching || isTodoFetching}
