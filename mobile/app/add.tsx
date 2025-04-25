@@ -1,20 +1,23 @@
+import {
+  View,
+  Text,
+  Modal,
+  TextInput,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { useState } from "react";
 import { router } from "expo-router";
 import Checkbox from "expo-checkbox";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-} from "react-native";
-import { useState } from "react";
+
 import Button from "@/components/button";
 import Cancel from "@/components/cancel";
+import { toast } from "@/components/toast";
 import { ClockIcon } from "@/constants/icons";
+import { createTodo, ITodo } from "@/app/services/todo/create-todo";
 
 type Category = {
   id: number;
@@ -45,17 +48,17 @@ const Add = () => {
   const categories: Category[] = [
     {
       id: 1,
-      name: "health",
-      color: "text-health-default",
-      bgColor: "bg-health-light",
-      borderColor: "border-health-default",
-    },
-    {
-      id: 2,
       name: "WORK",
       color: "text-work-default",
       bgColor: "bg-work-light",
       borderColor: "border-work-default",
+    },
+    {
+      id: 2,
+      name: "health",
+      color: "text-health-default",
+      bgColor: "bg-health-light",
+      borderColor: "border-health-default",
     },
     {
       id: 3,
@@ -108,6 +111,37 @@ const Add = () => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
+  const handleSave = async () => {
+    toast.success("Todo created successfully");
+
+    const dataToSend = {
+      title: taskText,
+      category:
+        Number(
+          categories.find(
+            (category) => category.name === selectedCategory?.name
+          )?.id
+        ) - 1,
+      subTodo: subTasks.map((task) => {
+        return {
+          id: task.id,
+          title: task.text,
+          isDone: task.isChecked,
+        };
+      }),
+      dueTime: selectedTime,
+    };
+
+    console.log(dataToSend);
+
+    try {
+      const response = await createTodo(dataToSend);
+      console.log(response);
+    } catch (error: any) {
+      console.log(error.response.data.message);
+      toast.error("An error occurred while creating todo");
+    }
+  };
   return (
     <SafeAreaView className="h-full bg-white">
       <View className="flex-1">
@@ -208,7 +242,12 @@ const Add = () => {
           <View className="flex-row items-center justify-between gap-4">
             <TouchableOpacity
               disabled={!taskText}
-              onPress={() => setShowTimePicker(true)}
+              onPress={() => {
+                if (!selectedTime) {
+                  setSelectedTime(new Date());
+                }
+                setShowTimePicker(true);
+              }}
               className={`h-[60px] w-[60px] rounded-[12px] ${
                 !taskText ? "bg-[#DEDEDE]" : "bg-[#393433]"
               } items-center justify-center`}
@@ -218,7 +257,7 @@ const Add = () => {
 
             <Button
               disabled={!taskText || !selectedCategory}
-              onPress={() => setShowTimePicker(true)}
+              onPress={handleSave}
               className={`flex-1 rounded-[12px] ${
                 !taskText || !selectedCategory ? "bg-[#DEDEDE]" : "bg-[#393433]"
               } items-center justify-center`}

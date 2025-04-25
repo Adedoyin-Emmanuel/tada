@@ -44,7 +44,8 @@ public class GetAllTodosQueryHandler : IRequestHandler<GetAllTodosQuery, Result<
                 UpdatedAt = todo.UpdatedAt
             }).ToList(),
             NextCursor = allTodos.NextCursor,
-            Limit = allTodos.Limit
+            Limit = allTodos.Limit,
+            Total = allTodos.Total
         };
 
         return Result.Ok(todosToReturn).WithSuccess("Todos fetched successfully");

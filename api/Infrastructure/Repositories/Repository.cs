@@ -35,6 +35,8 @@ public class Repository<T> : IRepository<T> where T : class, IBase
 
         var query = queryableEntity.OrderBy(entity => entity.Id);
 
+        int totalItems = await queryableEntity.CountAsync();
+
         if (cursor.HasValue && cursor.Value != Guid.Empty)
         {
             query = (IOrderedQueryable<T>)query.Where(entity => entity.Id > cursor.Value);
@@ -50,7 +52,8 @@ public class Repository<T> : IRepository<T> where T : class, IBase
         {
             Items = items,
             NextCursor = nextCursor,
-            Limit = limit
+            Limit = limit,
+            Total = totalItems
         };
     }
 
