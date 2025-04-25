@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Text,
   View,
-  ScrollView,
+  FlatList,
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
@@ -46,12 +46,24 @@ interface ITransformedTodo {
   }[];
 }
 
+interface IPaginatedTodos {
+  items: ITransformedTodo[];
+  nextCursor: string | null;
+  limit: number;
+  total: number;
+}
+
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
+  const [allTodos, setAllTodos] = useState<ITransformedTodo[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleTodoClick = () => {
     toast.success("Operation successful!");
-    //router.push("/view-task");
+    router.push("/view-task");
   };
 
   const {
@@ -78,7 +90,7 @@ const Home = () => {
   });
 
   const {
-    data: todos,
+    data: todosData,
     isLoading: isTodoLoading,
     isError: isTodoError,
     error: todoError,
@@ -86,42 +98,121 @@ const Home = () => {
     isFetching: isTodoFetching,
   } = useQuery({
     queryKey: ["get-all-todos"],
-    queryFn: getAllTodos,
+    queryFn: () => getAllTodos(),
     refetchOnWindowFocus: true,
     retry: 1,
     select: (apiResponse) => {
-      const transformed: ITransformedTodo[] = apiResponse.data.items.map(
-        (item: ITodo) => {
-          return {
-            id: item.id,
-            title: item.title,
-            category: {
-              name:
-                item.category == "MentalHealth"
-                  ? "mentalHealth"
-                  : item.category.toLowerCase(),
-              color: `text-${
-                item.category == "MentalHealth"
-                  ? "mentalHealth"
-                  : item.category.toLowerCase()
-              }-default`,
-              bgColor: `${
-                item.category == "MentalHealth"
-                  ? "mentalHealth"
-                  : item.category.toLowerCase()
-              }-light`,
-            },
-            isDone: item.isDone,
-            subTodos: item.subTodos,
-          };
-        }
-      );
+      const items = apiResponse.data.items.map((item: ITodo) => {
+        return {
+          id: item.id,
+          title: item.title,
+          category: {
+            name:
+              item.category == "MentalHealth"
+                ? "mentalHealth"
+                : item.category.toLowerCase(),
+            color: `text-${
+              item.category == "MentalHealth"
+                ? "mentalHealth"
+                : item.category.toLowerCase()
+            }-default`,
+            bgColor: `${
+              item.category == "MentalHealth"
+                ? "mentalHealth"
+                : item.category.toLowerCase()
+            }-light`,
+          },
+          isDone: item.isDone,
+          subTodos: item.subTodos,
+        };
+      });
+
+      const transformed: IPaginatedTodos = {
+        items,
+        nextCursor: apiResponse.data.nextCursor,
+        limit: apiResponse.data.limit,
+        total: apiResponse.data.total,
+      };
+
       return transformed;
     },
   });
 
+  const fetchMoreTodos = useCallback(async () => {
+    if (!nextCursor || !hasMore || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    try {
+      const response = await getAllTodos(nextCursor);
+
+      const newTodos = response.data.items.map((item: ITodo) => {
+        return {
+          id: item.id,
+          title: item.title,
+          category: {
+            name:
+              item.category == "MentalHealth"
+                ? "mentalHealth"
+                : item.category.toLowerCase(),
+            color: `text-${
+              item.category == "MentalHealth"
+                ? "mentalHealth"
+                : item.category.toLowerCase()
+            }-default`,
+            bgColor: `${
+              item.category == "MentalHealth"
+                ? "mentalHealth"
+                : item.category.toLowerCase()
+            }-light`,
+          },
+          isDone: item.isDone,
+          subTodos: item.subTodos,
+        };
+      });
+
+      setAllTodos((prev) => [...prev, ...newTodos]);
+      setNextCursor(response.data.nextCursor);
+      setHasMore(!!response.data.nextCursor);
+    } catch (error) {
+      console.error("Error fetching more todos:", error);
+      toast.error("Failed to load more todos");
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [nextCursor, hasMore, isLoadingMore]);
+
+  const renderTodoItem = ({ item }: { item: ITransformedTodo }) => (
+    <View className="px-5">
+      <Todo
+        key={item.id}
+        id={item.id}
+        title={item.title}
+        category={item.category}
+        isDone={item.isDone}
+        subTodos={item.subTodos}
+        onPress={handleTodoClick}
+        toggleTodo={() => {}}
+      />
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+    return (
+      <ActivityIndicator
+        size="small"
+        color="#393433"
+        style={{ marginVertical: 20 }}
+      />
+    );
+  };
+
   const onRefresh = async () => {
     setRefreshing(true);
+    setAllTodos([]);
+    setNextCursor(null);
+    setHasMore(true);
+
     try {
       await Promise.all([refetchHighlight(), refetchTodos()]);
     } catch (error) {
@@ -145,58 +236,50 @@ const Home = () => {
   }, [isTodoError, todoError]);
 
   useEffect(() => {
-    if (todos) {
-      console.log("Todos from DB");
-      console.log(JSON.stringify(todos, null, 2));
+    if (todosData) {
+      setAllTodos(todosData.items);
+      setNextCursor(todosData.nextCursor);
+      setHasMore(!!todosData.nextCursor);
     }
-  }, [todos]);
+  }, [todosData]);
+
+  const renderHeader = () => (
+    <View className="w-full p-5">
+      <Text className="font-ibold text-[36px]">
+        Today <Text className="font-imedium opacity-[30%]">{getDate()}</Text>
+      </Text>
+
+      <CategorySection isLoading={isHighlightLoading} data={todoHighlight} />
+    </View>
+  );
 
   return (
     <SafeAreaView className="h-full bg-white">
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing || isHighlightFetching || isTodoFetching}
-              onRefresh={onRefresh}
-              tintColor="#393433"
-            />
-          }
-        >
-          <View className="w-full p-5">
-            <Text className="font-ibold text-[36px]">
-              Today{" "}
-              <Text className="font-imedium opacity-[30%]">{getDate()}</Text>
-            </Text>
-
-            <CategorySection
-              isLoading={isHighlightLoading}
-              data={todoHighlight}
-            />
-
-            <View className="w-full mt-10">
-              <View>
-                {isTodoLoading && (
-                  <ActivityIndicator className="w-full h-full" />
-                )}
-                {todos &&
-                  todos.map((todo) => (
-                    <Todo
-                      key={todo.id}
-                      id={todo.id}
-                      title={todo.title}
-                      category={todo.category}
-                      isDone={todo.isDone}
-                      subTodos={todo.subTodos}
-                      onPress={handleTodoClick}
-                      toggleTodo={() => {}}
-                    />
-                  ))}
-              </View>
-            </View>
+        {isTodoLoading && !allTodos.length ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#393433" />
           </View>
-        </ScrollView>
-
+        ) : (
+          <FlatList
+            data={allTodos}
+            renderItem={renderTodoItem}
+            keyExtractor={(item) => item.id}
+            ListHeaderComponent={renderHeader}
+            ListFooterComponent={renderFooter}
+            contentContainerStyle={{ paddingBottom: 80 }}
+            onEndReached={fetchMoreTodos}
+            onEndReachedThreshold={0.5}
+            className="w-full"
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing || isHighlightFetching || isTodoFetching}
+                onRefresh={onRefresh}
+                tintColor="#393433"
+              />
+            }
+          />
+        )}
         <Fab />
       </GestureHandlerRootView>
       <StatusBar style="dark" />

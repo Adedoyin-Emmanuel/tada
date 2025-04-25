@@ -1,7 +1,8 @@
 import Axios from "@/app/config/axios";
 
-export const getAllTodos = async () => {
+export const getAllTodos = async (cursor?: string | null) => {
   await new Promise((resolve) => setTimeout(resolve, 5000));
-  const response = await Axios.get("/todo");
+  const endpoint = cursor ? `/todo?cursor=${cursor}` : "/todo";
+  const response = await Axios.get(endpoint);
   return response.data;
 };
