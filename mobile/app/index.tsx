@@ -181,14 +181,11 @@ const Home = () => {
     }
   }, [nextCursor, hasMore, isLoadingMore]);
 
-  // Create a memoized version of allTodos with guaranteed unique IDs
   const uniqueTodos = useMemo(() => {
-    // Create a Map to deduplicate todos by ID
     const todosMap = new Map();
     allTodos.forEach((todo) => {
       todosMap.set(todo.id, todo);
     });
-    // Convert back to array
     return Array.from(todosMap.values());
   }, [allTodos]);
 
@@ -221,16 +218,11 @@ const Home = () => {
     setRefreshing(true);
 
     try {
-      // Reset state before fetching new data
       setAllTodos([]);
       setNextCursor(null);
       setHasMore(true);
 
-      // Fetch fresh data
       await Promise.all([refetchHighlight(), refetchTodos()]);
-
-      // React Query automatically updates the todosData state
-      // which will trigger the useEffect that updates allTodos
     } catch (error) {
       toast.error("Failed to refresh. Please try again.");
       console.error("Refresh error:", error);
@@ -256,7 +248,6 @@ const Home = () => {
     if (todosData) {
       console.log("Todos data updated:", todosData);
       try {
-        // Check for duplicates before setting state
         const uniqueItems = todosData.items || [];
         const uniqueIds = new Set();
         const filteredItems = uniqueItems.filter((item) => {
