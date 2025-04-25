@@ -59,11 +59,11 @@ const Home = () => {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
   const queryClient = useQueryClient();
 
-  const handleTodoClick = () => {
-    toast.success("Operation successful!");
-    router.push("/view-task");
+  const handleTodoClick = (id: string) => {
+    router.push(`/view-task?id=${id}`);
   };
 
   const {
@@ -145,6 +145,12 @@ const Home = () => {
     try {
       const response = await getAllTodos(nextCursor);
 
+      if (!response.data || !Array.isArray(response.data.items)) {
+        console.error("Invalid response format:", response);
+        toast.error("Invalid data received from server");
+        return;
+      }
+
       const newTodos = response.data.items.map((item: ITodo) => {
         return {
           id: item.id,
@@ -173,9 +179,11 @@ const Home = () => {
       setAllTodos((prev) => [...prev, ...newTodos]);
       setNextCursor(response.data.nextCursor);
       setHasMore(!!response.data.nextCursor);
+      setHasAttemptedFetch(true);
     } catch (error) {
       console.error("Error fetching more todos:", error);
       toast.error("Failed to load more todos");
+      setHasAttemptedFetch(true);
     } finally {
       setIsLoadingMore(false);
     }
@@ -189,6 +197,28 @@ const Home = () => {
     return Array.from(todosMap.values());
   }, [allTodos]);
 
+  const toggleTodo = useCallback((todoId: string, subTodoId?: number) => {
+    setAllTodos((prevTodos) =>
+      prevTodos.map((todo) => {
+        if (todo.id === todoId) {
+          if (subTodoId !== undefined) {
+            // Toggle a subtodo
+            const updatedSubTodos = [...todo.subTodos];
+            updatedSubTodos[subTodoId] = {
+              ...updatedSubTodos[subTodoId],
+              isDone: !updatedSubTodos[subTodoId].isDone,
+            };
+            return { ...todo, subTodos: updatedSubTodos };
+          } else {
+            // Toggle main todo
+            return { ...todo, isDone: !todo.isDone };
+          }
+        }
+        return todo;
+      })
+    );
+  }, []);
+
   const renderTodoItem = ({ item }: { item: ITransformedTodo }) => (
     <View className="px-5 mb-2">
       <Todo
@@ -197,14 +227,14 @@ const Home = () => {
         category={item.category}
         isDone={item.isDone}
         subTodos={item.subTodos}
-        onPress={handleTodoClick}
-        toggleTodo={() => {}}
+        onPress={() => handleTodoClick(item.id)}
+        toggleTodo={toggleTodo}
       />
     </View>
   );
 
   const renderFooter = () => {
-    if (!isLoadingMore) return null;
+    if (!isLoadingMore || hasAttemptedFetch) return null;
     return (
       <ActivityIndicator
         size="small"
@@ -218,10 +248,6 @@ const Home = () => {
     setRefreshing(true);
 
     try {
-      setAllTodos([]);
-      setNextCursor(null);
-      setHasMore(true);
-
       await Promise.all([refetchHighlight(), refetchTodos()]);
     } catch (error) {
       toast.error("Failed to refresh. Please try again.");
@@ -291,12 +317,16 @@ const Home = () => {
             data={uniqueTodos}
             renderItem={renderTodoItem}
             keyExtractor={(item) => item.id}
-            extraData={refreshing}
+            extraData={[refreshing, allTodos]}
             ListHeaderComponent={renderHeader}
             ListFooterComponent={renderFooter}
             contentContainerStyle={{ paddingBottom: 80 }}
-            onEndReached={fetchMoreTodos}
-            onEndReachedThreshold={0.5}
+            onEndReached={() => {
+              if (!isLoadingMore && hasMore && nextCursor) {
+                fetchMoreTodos();
+              }
+            }}
+            onEndReachedThreshold={0.2}
             className="w-full"
             removeClippedSubviews={false}
             refreshControl={

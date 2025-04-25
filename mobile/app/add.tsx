@@ -122,9 +122,8 @@ const Add = () => {
             (category) => category.name === selectedCategory?.name
           )?.id
         ) - 1,
-      subTodo: subTasks.map((task) => {
+      subTodos: subTasks.map((task) => {
         return {
-          id: task.id,
           title: task.text,
           isDone: task.isChecked,
         };
