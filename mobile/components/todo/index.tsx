@@ -12,21 +12,20 @@ interface TodoProps {
     color: string;
     bgColor: string;
   };
-  isChecked: boolean;
+  isDone: boolean;
   subTodos: {
-    id: string;
     title: string;
-    isChecked: boolean;
+    isDone: boolean;
   }[];
   onPress: () => void;
-  toggleTodo: (todoId: string, subTodoId?: string) => void;
+  toggleTodo: (todoId: string, subTodoId?: number) => void;
 }
 
 const Todo = ({
   id,
   title,
   category,
-  isChecked,
+  isDone,
   subTodos,
   onPress,
   toggleTodo,
@@ -34,7 +33,6 @@ const Todo = ({
   const handleDeleteTodo = (todoId: string) => {
     console.log("delete todo", todoId);
   };
-
 
   const renderRightActions = (
     progress: Animated.AnimatedInterpolation<number>,
@@ -74,7 +72,7 @@ const Todo = ({
         <Pressable className="bg-white active:opacity-70" onPress={onPress}>
           <View className="flex-row items-center gap-2 mb-3">
             <Checkbox
-              value={isChecked}
+              value={isDone}
               onValueChange={() => toggleTodo(id)}
               style={{
                 width: 20,
@@ -83,7 +81,7 @@ const Todo = ({
                 borderColor: "#D6D6D6",
                 borderRadius: 4,
               }}
-              color={isChecked ? "#393433" : undefined}
+              color={isDone ? "#393433" : undefined}
             />
 
             <View className="my-3 mx-2 flex items-start gap-2">
@@ -105,14 +103,11 @@ const Todo = ({
         </Pressable>
       </Swipeable>
 
-      {subTodos.map((subTodo) => (
-        <View
-          key={subTodo.id}
-          className="flex-row item-center gap-2 ml-12 mt-2 mb-3"
-        >
+      {subTodos.map((subTodo, _i) => (
+        <View key={_i} className="flex-row item-center gap-2 ml-12 mt-2 mb-3">
           <Checkbox
-            value={subTodo.isChecked}
-            onValueChange={() => toggleTodo(id, subTodo.id)}
+            value={subTodo.isDone}
+            onValueChange={() => toggleTodo(id, _i)}
             style={{
               width: 18,
               height: 18,
@@ -120,7 +115,7 @@ const Todo = ({
               borderColor: "#D6D6D6",
               borderRadius: 4,
             }}
-            color={subTodo.isChecked ? "#393433" : undefined}
+            color={subTodo.isDone ? "#393433" : undefined}
           />
           <View className="flex items-start">
             <Text className="text-primary font-iregular text-[16px]">

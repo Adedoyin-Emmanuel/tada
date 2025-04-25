@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { router } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useQuery } from "@tanstack/react-query";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Text, View, ScrollView, RefreshControl } from "react-native";
+import {
+  Text,
+  View,
+  ScrollView,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Fab from "@/components/fab";
@@ -11,97 +17,50 @@ import Todo from "@/components/todo";
 import { getDate } from "@/utils/get-date";
 import { toast } from "@/components/toast";
 import CategorySection from "@/components/category-section";
+import { getAllTodos } from "@/app/services/todo/get-todos";
 import { getTodoHighlight } from "@/app/services/todo/get-highlight";
+
+interface ITodo {
+  id: string;
+  title: string;
+  category: string;
+  isDone: boolean;
+  subTodos: {
+    title: string;
+    isDone: boolean;
+  }[];
+}
+
+interface ITransformedTodo {
+  id: string;
+  title: string;
+  isDone: boolean;
+  category: {
+    name: string;
+    color: string;
+    bgColor: string;
+  };
+  subTodos: {
+    title: string;
+    isDone: boolean;
+  }[];
+}
 
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
-  const [todos, setTodos] = useState([
-    {
-      id: "1",
-      title: "Drink 8 glasses of water",
-      category: {
-        name: "health",
-        color: "text-health-default",
-        bgColor: "health-light",
-      },
-      isChecked: false,
-      subTodos: [],
-    },
-    {
-      id: "2",
-      title: "Edit the PDF",
-      category: {
-        name: "WORK",
-        color: "text-work-default",
-        bgColor: "work-light",
-      },
-      isChecked: false,
-      subTodos: [
-        { id: "21", title: "Add executive summary", isChecked: false },
-      ],
-    },
-    {
-      id: "3",
-      title: "Write in a gratitude journal",
-      category: {
-        name: "Mental Health",
-        color: "text-mentalHealth-default",
-        bgColor: "mentalHealth-light",
-      },
-      isChecked: false,
-      subTodos: [
-        { id: "31", title: "Get a note", isChecked: false },
-        { id: "32", title: "Follow the YouTube tutorial", isChecked: false },
-      ],
-    },
-
-    {
-      id: "4",
-      title: "Call my baby girl",
-      category: {
-        name: "others",
-        color: "text-others-default",
-        bgColor: "others-light",
-      },
-      isChecked: false,
-      subTodos: [],
-    },
-  ]);
 
   const handleTodoClick = () => {
     toast.success("Operation successful!");
     //router.push("/view-task");
   };
 
-  const toggleTodo = (todoId: string, subTodoId?: string) => {
-    setTodos(
-      todos.map((todo) => {
-        if (subTodoId) {
-          if (todo.id === todoId) {
-            return {
-              ...todo,
-              subTodos: todo.subTodos.map((subTodo) =>
-                subTodo.id === subTodoId
-                  ? { ...subTodo, isChecked: !subTodo.isChecked }
-                  : subTodo
-              ),
-            };
-          }
-        } else if (todo.id === todoId) {
-          return { ...todo, isChecked: !todo.isChecked };
-        }
-        return todo;
-      })
-    );
-  };
-
   const {
     data: todoHighlight,
-    isLoading,
+    isLoading: isHighlightLoading,
     isError,
     error,
-    refetch,
-    isFetching,
+    refetch: refetchHighlight,
+    isFetching: isHighlightFetching,
   } = useQuery({
     queryKey: ["get-todo-highlight"],
     queryFn: getTodoHighlight,
@@ -118,10 +77,53 @@ const Home = () => {
     },
   });
 
+  const {
+    data: todos,
+    isLoading: isTodoLoading,
+    isError: isTodoError,
+    error: todoError,
+    refetch: refetchTodos,
+    isFetching: isTodoFetching,
+  } = useQuery({
+    queryKey: ["get-all-todos"],
+    queryFn: getAllTodos,
+    refetchOnWindowFocus: true,
+    retry: 1,
+    select: (apiResponse) => {
+      const transformed: ITransformedTodo[] = apiResponse.data.items.map(
+        (item: ITodo) => {
+          return {
+            id: item.id,
+            title: item.title,
+            category: {
+              name:
+                item.category == "MentalHealth"
+                  ? "mentalHealth"
+                  : item.category.toLowerCase(),
+              color: `text-${
+                item.category == "MentalHealth"
+                  ? "mentalHealth"
+                  : item.category.toLowerCase()
+              }-default`,
+              bgColor: `${
+                item.category == "MentalHealth"
+                  ? "mentalHealth"
+                  : item.category.toLowerCase()
+              }-light`,
+            },
+            isDone: item.isDone,
+            subTodos: item.subTodos,
+          };
+        }
+      );
+      return transformed;
+    },
+  });
+
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      await refetch();
+      await Promise.all([refetchHighlight(), refetchTodos()]);
     } catch (error) {
       toast.error("Failed to refresh. Please try again.");
     } finally {
@@ -129,9 +131,25 @@ const Home = () => {
     }
   };
 
-  if (isError) {
-    toast.error(`${error.message}`);
-  }
+  useEffect(() => {
+    if (isError) {
+      console.log(error.message);
+      toast.error(`${error.message}`);
+    }
+  }, [isError, error]);
+
+  useEffect(() => {
+    if (isTodoError) {
+      toast.error(`${todoError.message}`);
+    }
+  }, [isTodoError, todoError]);
+
+  useEffect(() => {
+    if (todos) {
+      console.log("Todos from DB");
+      console.log(JSON.stringify(todos, null, 2));
+    }
+  }, [todos]);
 
   return (
     <SafeAreaView className="h-full bg-white">
@@ -139,7 +157,7 @@ const Home = () => {
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={refreshing || isFetching}
+              refreshing={refreshing || isHighlightFetching || isTodoFetching}
               onRefresh={onRefresh}
               tintColor="#393433"
             />
@@ -151,22 +169,29 @@ const Home = () => {
               <Text className="font-imedium opacity-[30%]">{getDate()}</Text>
             </Text>
 
-            <CategorySection isLoading={isLoading} data={todoHighlight} />
+            <CategorySection
+              isLoading={isHighlightLoading}
+              data={todoHighlight}
+            />
 
             <View className="w-full mt-10">
               <View>
-                {todos.map((todo) => (
-                  <Todo
-                    key={todo.id}
-                    id={todo.id}
-                    title={todo.title}
-                    category={todo.category}
-                    isChecked={todo.isChecked}
-                    subTodos={todo.subTodos}
-                    onPress={handleTodoClick}
-                    toggleTodo={toggleTodo}
-                  />
-                ))}
+                {isTodoLoading && (
+                  <ActivityIndicator className="w-full h-full" />
+                )}
+                {todos &&
+                  todos.map((todo) => (
+                    <Todo
+                      key={todo.id}
+                      id={todo.id}
+                      title={todo.title}
+                      category={todo.category}
+                      isDone={todo.isDone}
+                      subTodos={todo.subTodos}
+                      onPress={handleTodoClick}
+                      toggleTodo={() => {}}
+                    />
+                  ))}
               </View>
             </View>
           </View>

@@ -20,7 +20,7 @@ const CustomMessage = ({ message }: MessageComponentProps) => (
 export const FlashMessageComponent = () => (
   <FlashMessage
     position="top"
-    floating={false}
+    floating={true}
     duration={2000}
     animated={true}
     renderFlashMessageIcon={() => null}

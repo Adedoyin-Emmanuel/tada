@@ -27,7 +27,7 @@ var app = builder.Build();
         app.MapScalarApiReference();
         
     }
-
+    
     app.UseSerilogRequestLogging();
     app.UseHttpsRedirection();
     app.UseAuthorization();
