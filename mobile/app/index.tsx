@@ -9,8 +9,12 @@ import {
   FlatList,
   RefreshControl,
   ActivityIndicator,
+  Alert,
+  TouchableOpacity,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Swipeable, RectButton } from "react-native-gesture-handler";
+import { Trash2 } from "lucide-react-native";
 
 import Fab from "@/components/fab";
 import Todo from "@/components/todo";
@@ -19,6 +23,7 @@ import { toast } from "@/components/toast";
 import CategorySection from "@/components/category-section";
 import { getAllTodos } from "@/app/services/todo/get-todos";
 import { getTodoHighlight } from "@/app/services/todo/get-highlight";
+import { deleteTodo } from "@/app/services/todo/delete-todo";
 
 interface ITodo {
   id: string;
@@ -219,19 +224,85 @@ const Home = () => {
     );
   }, []);
 
-  const renderTodoItem = ({ item }: { item: ITransformedTodo }) => (
-    <View className="px-5 mb-2">
-      <Todo
-        id={item.id}
-        title={item.title}
-        category={item.category}
-        isDone={item.isDone}
-        subTodos={item.subTodos}
-        onPress={() => handleTodoClick(item.id)}
-        toggleTodo={toggleTodo}
-      />
-    </View>
-  );
+  const renderRightActions = (todoId: string, close: () => void) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          close();
+          // Show confirmation alert when delete is pressed
+          Alert.alert(
+            "Delete Todo",
+            "Are you sure you want to delete this todo?",
+            [
+              {
+                text: "Cancel",
+                style: "cancel",
+                onPress: () => close(),
+              },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: async () => {
+                  try {
+                    await deleteTodo(todoId);
+                    // Remove the todo from local state
+                    setAllTodos((prevTodos) =>
+                      prevTodos.filter((todo) => todo.id !== todoId)
+                    );
+                    // Invalidate the query to refetch data
+                    queryClient.invalidateQueries({
+                      queryKey: ["get-all-todos"],
+                    });
+                    queryClient.invalidateQueries({
+                      queryKey: ["get-todo-highlight"],
+                    });
+                    toast.success("Todo deleted successfully");
+                  } catch (error) {
+                    console.error("Error deleting todo:", error);
+                    toast.error("Failed to delete todo");
+                  }
+                },
+              },
+            ]
+          );
+        }}
+        className="bg-red-500 w-20 h-full justify-center items-center"
+        activeOpacity={0.8}
+      >
+        <Trash2 color="#fff" size={24} />
+      </TouchableOpacity>
+    );
+  };
+
+  const renderTodoItem = ({ item }: { item: ITransformedTodo }) => {
+    let swipeableRef: Swipeable | null = null;
+
+    return (
+      <View className="px-5 mb-2">
+        <Swipeable
+          ref={(ref) => (swipeableRef = ref)}
+          renderRightActions={() =>
+            renderRightActions(item.id, () => swipeableRef?.close())
+          }
+          friction={2}
+          overshootRight={false}
+          enabled={true}
+          hitSlop={{ left: 0, right: 0, top: 0, bottom: 0 }}
+          containerStyle={{ borderRadius: 16 }}
+        >
+          <Todo
+            id={item.id}
+            title={item.title}
+            category={item.category}
+            isDone={item.isDone}
+            subTodos={item.subTodos}
+            onPress={() => handleTodoClick(item.id)}
+            toggleTodo={toggleTodo}
+          />
+        </Swipeable>
+      </View>
+    );
+  };
 
   const renderFooter = () => {
     if (!isLoadingMore || hasAttemptedFetch) return null;

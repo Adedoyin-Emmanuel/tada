@@ -24,6 +24,7 @@ public class GetAllTodosQueryItem
 
 public class SubTodoDto
 {
+    public int Id { get; set; }
     public string Title { get; set; }
     public bool IsDone { get; set; }
 }

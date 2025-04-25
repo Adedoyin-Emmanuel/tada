@@ -9,15 +9,25 @@ import {
   ActivityIndicator,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import dayjs from "dayjs";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Check,
+  Calendar,
+  Clock,
+  Trash2,
+  Edit2,
+  Plus,
+  Save,
+} from "lucide-react-native";
 
 import Cancel from "@/components/cancel";
 import Button from "@/components/button";
 import { toast } from "@/components/toast";
 import { getTodoById } from "@/app/services/todo/get-todo-by-id";
+import { updateTodo } from "@/app/services/todo/update-todo";
 
 interface ITodo {
   id: string;
@@ -25,6 +35,7 @@ interface ITodo {
   category: string;
   isDone: boolean;
   subTodos: {
+    id?: string;
     title: string;
     isDone: boolean;
   }[];
@@ -36,6 +47,7 @@ interface ITodo {
 const ViewTask = () => {
   const { id } = useLocalSearchParams();
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [todo, setTodo] = useState<ITodo | null>(null);
   const [editedTitle, setEditedTitle] = useState("");
@@ -55,10 +67,18 @@ const ViewTask = () => {
 
       try {
         const response = await getTodoById(id as string);
-        console.log("Todo API response:", JSON.stringify(response, null, 2));
+        console.log(
+          "Todo API raw response:",
+          JSON.stringify(response, null, 2)
+        );
 
         // The API returns a response with data nested under the "data" property
         if (response && response.data) {
+          // Log the structure of subTodos to see if they have IDs
+          console.log(
+            "SubTodos structure:",
+            JSON.stringify(response.data.subTodos, null, 2)
+          );
           setTodo(response.data);
           setEditedTitle(response.data.title);
         } else {
@@ -76,30 +96,82 @@ const ViewTask = () => {
     fetchTodo();
   }, [id]);
 
-  const handleClose = () => {
-    // Here you would typically save changes to the backend
-    router.dismiss();
-    toast.success("Your changes have been saved successfully!");
+  const handleSave = async () => {
+    if (!todo || !id) return;
+
+    try {
+      setSaving(true);
+
+      // Format subtodos to include id if it exists
+      const formattedSubTodos = todo.subTodos.map((subTodo) => {
+        const subtodoObj: any = {
+          title: subTodo.title,
+          isDone: subTodo.isDone,
+        };
+
+        // Include the id if it exists
+        if (subTodo.id) {
+          subtodoObj.id = subTodo.id;
+        }
+
+        return subtodoObj;
+      });
+
+      // Create update payload with exact structure needed by API
+      const updatedTodoData = {
+        title: editedTitle,
+        category: todo.category,
+        isDone: todo.isDone,
+        subTodos: formattedSubTodos,
+      };
+
+      console.log(
+        "Saving todo with data:",
+        JSON.stringify(updatedTodoData, null, 2)
+      );
+
+      // Call the update API
+      const response = await updateTodo(id as string, updatedTodoData);
+      console.log("API Response:", JSON.stringify(response, null, 2));
+
+      // Check for success
+      if (response) {
+        toast.success("Your changes have been saved successfully!");
+        router.dismiss();
+      } else {
+        throw new Error("Failed to update todo");
+      }
+    } catch (err) {
+      console.error("Error updating todo:", err);
+      toast.error("Failed to save changes");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const toggleTodo = (todoId: string, subTodoIndex?: number) => {
     if (!todo) return;
 
+    // Only update local state, don't send API request
+    let updatedTodo;
     if (subTodoIndex !== undefined) {
-      setTodo({
+      updatedTodo = {
         ...todo,
         subTodos: todo.subTodos.map((subTodo, index) =>
           index === subTodoIndex
             ? { ...subTodo, isDone: !subTodo.isDone }
             : subTodo
         ),
-      });
+      };
     } else {
-      setTodo({
+      updatedTodo = {
         ...todo,
         isDone: !todo.isDone,
-      });
+      };
     }
+
+    // Update local state immediately
+    setTodo(updatedTodo);
   };
 
   const startEditingSubTodo = (index: number) => {
@@ -136,14 +208,7 @@ const ViewTask = () => {
   };
 
   const deleteSubTodo = (index: number) => {
-    if (!todo) return;
-
-    const updatedSubTodos = todo.subTodos.filter((_, i) => i !== index);
-
-    setTodo({
-      ...todo,
-      subTodos: updatedSubTodos,
-    });
+    // This function is no longer needed
   };
 
   if (loading) {
@@ -190,26 +255,32 @@ const ViewTask = () => {
   );
 
   return (
-    <SafeAreaView className="h-full relative">
+    <SafeAreaView className="h-full relative bg-white">
       <ScrollView className="mb-20">
         <View className="w-full p-5 pb-24">
-          <Cancel onPress={handleClose} />
+          <Cancel onPress={() => router.dismiss()} />
 
           <TextInput
-            className="text-[36px] font-imedium mt-5 border-b border-gray-200 pb-2"
+            className="text-[36px] font-imedium mt-5 pb-2"
             value={editedTitle}
             onChangeText={setEditedTitle}
             onEndEditing={() =>
               setTodo(todo ? { ...todo, title: editedTitle } : null)
             }
+            placeholderTextColor="#9CA3AF"
+            placeholder="Todo title"
           />
 
-          <Text className="text-gray-500 mt-2">
-            Created {formattedCreatedDate}
-          </Text>
+          <View className="flex-row items-center mt-2">
+            <Clock size={16} color="#6B7280" />
+            <Text className="text-gray-500 ml-2">
+              Created {formattedCreatedDate}
+            </Text>
+          </View>
 
-          <View className="mt-4 flex-row items-center">
-            <Text className="text-gray-700 font-imedium">Due: </Text>
+          <View className="mt-4 flex-row items-center ">
+            <Calendar size={18} color="#4B5563" />
+            <Text className="text-gray-700 font-imedium ml-2">Due: </Text>
             <Text className="text-gray-700 ml-1">
               {todo.dueTime
                 ? dayjs(todo.dueTime).format("MMM D, YYYY")
@@ -217,30 +288,42 @@ const ViewTask = () => {
             </Text>
           </View>
 
-          <View className="w-full mt-10">
-            <Text className="text-[22px] font-ibold mb-4">Subtasks</Text>
+          <View className="w-full mt-8">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-[20px] font-ibold">Subtodo</Text>
+              <View className="flex-row items-center">
+                <Text className="text-gray-500 mr-2 text-[14px]">
+                  {todo.subTodos.filter((st) => st.isDone).length}/
+                  {todo.subTodos.length} completed
+                </Text>
+              </View>
+            </View>
 
-            <View>
+            <View className="mt-4 pt-2">
               {todo.subTodos.map((subTodo, index) => (
-                <View key={index} className="mb-3">
+                <View
+                  key={index}
+                  className="mb-3 py-2"
+                  pointerEvents="box-none"
+                >
                   <View className="flex-row items-center">
-                    <Checkbox
-                      value={subTodo.isDone}
-                      onValueChange={() => toggleTodo(todo.id, index)}
+                    <TouchableOpacity
+                      onPress={() => toggleTodo(todo.id, index)}
+                      className="w-6 h-6 border border-gray-300 rounded-md items-center justify-center mr-2"
                       style={{
-                        width: 20,
-                        height: 20,
-                        borderWidth: 1,
-                        borderColor: "#D6D6D6",
-                        borderRadius: 4,
+                        backgroundColor: subTodo.isDone
+                          ? "#393433"
+                          : "transparent",
                       }}
-                      color={subTodo.isDone ? "#393433" : undefined}
-                    />
+                      activeOpacity={0.7}
+                    >
+                      {subTodo.isDone && <Check size={14} color="#fff" />}
+                    </TouchableOpacity>
 
                     <View className="flex-1 mx-2">
                       {editingSubTodoIndex === index ? (
                         <TextInput
-                          className="border-b border-gray-400 py-1 text-[17px] flex-1"
+                          className="py-1 text-[17px] flex-1"
                           value={editedSubTodoText}
                           onChangeText={setEditedSubTodoText}
                           autoFocus
@@ -251,6 +334,7 @@ const ViewTask = () => {
                         <TouchableOpacity
                           onPress={() => startEditingSubTodo(index)}
                           className="py-1"
+                          activeOpacity={0.7}
                         >
                           <Text
                             className={`text-primary font-imedium text-[17px] ${
@@ -263,37 +347,47 @@ const ViewTask = () => {
                       )}
                     </View>
 
-                    <TouchableOpacity
-                      onPress={() => deleteSubTodo(index)}
-                      className="p-2"
-                    >
-                      <Ionicons name="trash-outline" size={18} color="#666" />
-                    </TouchableOpacity>
+                    <View className="flex-row items-center">
+                      <TouchableOpacity
+                        onPress={() => startEditingSubTodo(index)}
+                        className="p-2 mr-1"
+                        activeOpacity={0.7}
+                      >
+                        <Edit2 size={16} color="#6B7280" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               ))}
 
-              <View className="mt-4 flex-row items-center border-b border-gray-300 pb-2">
+              <View className="mt-4 flex-row items-center bg-gray-50 rounded-xl p-3">
                 <TextInput
-                  className="flex-1 text-[17px]"
+                  className="flex-1 text-[17px] pl-2"
                   placeholder="Add a new subtask..."
                   value={newSubTodoText}
                   onChangeText={setNewSubTodoText}
                   onSubmitEditing={addNewSubTodo}
+                  placeholderTextColor="#9CA3AF"
                 />
                 <TouchableOpacity
                   onPress={addNewSubTodo}
-                  className="ml-2 p-2 bg-gray-200 rounded-full"
+                  className="ml-2 p-2 bg-gray-200 rounded-full items-center justify-center"
                   disabled={!newSubTodoText.trim()}
+                  style={{ opacity: newSubTodoText.trim() ? 1 : 0.5 }}
                 >
-                  <Ionicons name="add" size={18} color="#393433" />
+                  <Plus size={18} color="#393433" />
                 </TouchableOpacity>
               </View>
 
               {todo.subTodos.length === 0 && newSubTodoText === "" && (
-                <Text className="text-gray-500 italic mt-4">
-                  No subtasks available. Add one above.
-                </Text>
+                <View className="mt-6 items-center py-8 bg-gray-50 rounded-xl">
+                  <Text className="text-gray-500 text-center">
+                    No subtasks available yet.
+                  </Text>
+                  <Text className="text-gray-500 text-center mt-1">
+                    Add one using the field above.
+                  </Text>
+                </View>
               )}
             </View>
           </View>
@@ -301,8 +395,12 @@ const ViewTask = () => {
       </ScrollView>
 
       <View className="absolute bottom-0 left-0 right-0 p-5">
-        <Button onPress={handleClose}>
-          <Text className="text-white font-imedium text-[18px]">Save</Text>
+        <Button onPress={handleSave} disabled={saving}>
+          {saving ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text className="text-white font-imedium text-[18px]">Save</Text>
+          )}
         </Button>
       </View>
       <StatusBar />

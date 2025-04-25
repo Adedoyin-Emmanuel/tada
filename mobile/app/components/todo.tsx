@@ -61,11 +61,15 @@ const Todo = ({
         </View>
       </View>
 
-      {/* Sub-Todos */}
+      {/* Sub-Todos - Ensure they don't interfere with swipe gestures */}
       {subTodos.length > 0 && (
-        <View className="ml-8 mt-2">
+        <View className="ml-8 mt-2" pointerEvents="box-none">
           {subTodos.map((item, index) => (
-            <View key={index} className="mb-2 flex-row items-center gap-2">
+            <View
+              key={index}
+              className="mb-2 flex-row items-center gap-2"
+              pointerEvents="box-only"
+            >
               <Checkbox
                 value={item.isDone}
                 onValueChange={() => toggleTodo(id, index)}

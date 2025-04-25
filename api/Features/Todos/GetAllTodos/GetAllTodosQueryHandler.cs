@@ -36,6 +36,7 @@ public class GetAllTodosQueryHandler : IRequestHandler<GetAllTodosQuery, Result<
                 IsDone = todo.IsDone,
                 SubTodos = todo.SubTodos?.Select(sub => new SubTodoDto
                 {
+                    Id = sub.Id,
                     Title = sub.Title,
                     IsDone = sub.IsDone
                 }).ToList(),
